@@ -355,6 +355,13 @@
                     "items": {
                         "$ref": "#/definitions/Activity"
                     }
+                },
+                "string_array": {
+                    "type": "array",
+                    "description" : "Array of strings",
+                    "items" : { 
+                        "type" : "string"
+                    }
                 }
             }
         },

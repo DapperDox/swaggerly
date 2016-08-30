@@ -1,4 +1,4 @@
-package spec
+	package spec
 
 import (
 	"encoding/json"
@@ -493,6 +493,21 @@ func processMethod(api *API, pathItem *spec.PathItem, o *spec.Operation, path, m
 
 func checkPropertyType(s *spec.Schema) string {
 
+	/*
+	   (string) (len=12) "string_array": (spec.Schema) {
+	    SchemaProps: (spec.SchemaProps) {
+	     Description: (string) (len=16) "Array of strings",
+	     Type: (spec.StringOrArray) (len=1 cap=1) { (string) (len=5) "array" },
+	     Items: (*spec.SchemaOrArray)(0xc8205bb000)({
+	      Schema: (*spec.Schema)(0xc820202480)({
+	       SchemaProps: (spec.SchemaProps) {
+	        Type: (spec.StringOrArray) (len=1 cap=1) { (string) (len=6) "string" },
+	       },
+	      }),
+	     }),
+	    },
+	   }
+	*/
 	ptype := "primitive"
 
 	if s.Type == nil {
@@ -510,6 +525,9 @@ func checkPropertyType(s *spec.Schema) string {
 
 		if s.Type == nil {
 			ptype = "array of objects"
+			if s.SchemaProps.Type != nil {
+				ptype = "array of SOMETHING"
+			}
 		} else if s.Type.Contains("array") {
 			ptype = "array of primitives"
 		}
@@ -564,7 +582,6 @@ func resourceFromSchema(s *spec.Schema, method *Method, fqNS []string) *Resource
 			s = &s.Items.Schemas[0]
 			log.Printf("got s.Items.Schemas[0] for %s\n", s.Title)
 		}
-
 		if s.Type == nil {
 			log.Printf("Got array of objects? Name %s\n", s.Title)
 			//////s.Type = append(stringorarray, s.Title) // Especially for an array of objects.. Perhaps this should be in COMPILE PROPERTIES??
@@ -574,6 +591,9 @@ func resourceFromSchema(s *spec.Schema, method *Method, fqNS []string) *Resource
 		} else if s.Type.Contains("array") {
 			log.Printf("Got array for %s\n", s.Title)
 			s.Type = stringorarray
+		} else if stringorarray.Contains("array") && len(s.Properties) == 0 {
+			//if we get here then we can assume the type is supposed to be an array of primitives
+			s.Type = spec.StringOrArray([]string{"[" + string(s.Type[0]) + "]"})
 		}
 		//fmt.Printf("TYPE IS %s\n", s.Type[0] )
 		//fmt.Printf("REMAP SCHEMA\n")
@@ -587,7 +607,7 @@ func resourceFromSchema(s *spec.Schema, method *Method, fqNS []string) *Resource
 	}
 
 	if len(fqNS) == 0 && id == "" {
-		logger.Errorf(nil, "Error: %s %s references a model definition that does not have a title memeber.", strings.ToUpper(method.Method), method.Path)
+		logger.Errorf(nil, "Error: %s %s references a model definition that does not have a title member.", strings.ToUpper(method.Method), method.Path)
 		//spew.Dump(method)
 		os.Exit(1)
 	}
@@ -638,7 +658,7 @@ func resourceFromSchema(s *spec.Schema, method *Method, fqNS []string) *Resource
 	//logger.Tracef(nil, "expandSchema Type %s FQNS '%s'\n", s.Type, strings.Join(myFQNS, "."))
 
 	required := make(map[string]bool)
-	json_representation := make(map[string]interface{})
+	json_representation := make(map[string]interface{}) // FIXME This is TOO restrictive. What about arrays?
 
 	compileproperties(s, r, method, id, required, json_representation, myFQNS, chopped)
 
@@ -652,15 +672,16 @@ func resourceFromSchema(s *spec.Schema, method *Method, fqNS []string) *Resource
 	//       say that the response for a status code is { "type":"array", "schema" : { "$ref": model } }
 	//
 
-	//fmt.Printf("DUMP s.Type\n")
-	//spew.Dump(s.Type)
 	if strings.ToLower(r.Type[0]) != "object" {
 		if strings.ToLower(r.Type[0]) == "array" {
 			var array_obj []map[string]interface{}
 			array_obj = append(array_obj, json_representation)
-			schema, _ := json.MarshalIndent(array_obj, "", "    ")
+			schema, err := json.MarshalIndent(array_obj, "", "    ")
+			if err != nil {
+				logger.Errorf(nil, "Error encoding schema json: %s", err)
+			}
 			r.Schema = string(schema)
-		} else {
+		}else {
 			r.Schema = r.Type[0]
 		}
 	} else {
@@ -729,21 +750,22 @@ func compileproperties(s *spec.Schema, r *Resource, method *Method, id string, r
 						log.Printf("B call resourceFromSchema for property %s\n", name)
 						r.Properties[name] = resourceFromSchema(property.Items.Schema, method, xFQNS)
 
-						// log.Printf("Generated Properties:\n")
-						// spew.Dump(r.Properties[name])
-
 						// Some outputs (example schema, member description) are generated differently
 						// if the array member references an object or a primitive type
 						var example_sch string
-						if strings.ToLower(r.Properties[name].Type[0]) == "object" {
+						switch strings.ToLower(r.Properties[name].Type[0]) {
+						case "object":
 							example_sch = r.Properties[name].Schema
-						} else {
+						case "array":
+							example_sch = r.Properties[name].Schema
+							r.Properties[name].Description = property.Description
+						default:
 							example_sch = "\"" + r.Properties[name].Type[0] + "\""
 							r.Properties[name].Description = property.Description
 						}
 
 						var f interface{}
-						_ = json.Unmarshal([]byte("["+example_sch+"]"), &f)
+						_ = json.Unmarshal([]byte(example_sch), &f)
 						json_rep[name] = f
 
 						// Override type to reflect it is an array
