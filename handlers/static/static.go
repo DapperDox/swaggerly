@@ -26,11 +26,13 @@ func Register(r *pat.Router) {
 	var allow bool
 
 	for _, file := range asset.AssetNames() {
+		mime.AddExtensionType(".woff", "font")
 		mimeType := mime.TypeByExtension(filepath.Ext(file))
 
 		switch {
 		case strings.HasPrefix(mimeType, "image"),
 			strings.HasPrefix(mimeType, "text/css"),
+			strings.HasPrefix(mimeType, "font"),
 			strings.HasSuffix(mimeType, "javascript"):
 			allow = true
 		default:
