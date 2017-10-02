@@ -24,6 +24,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/dapperdox/dapperdox/config"
@@ -127,6 +128,7 @@ type Method struct {
 	OperationName   string
 	NavigationName  string
 	Path            string
+	SortOrder       string
 	Consumes        []string
 	Produces        []string
 	PathParams      []Parameter
@@ -197,6 +199,12 @@ type Header struct {
 	Required                    bool
 	Enum                        []string
 }
+
+type BySortOrder []Method
+
+func (a BySortOrder) Len() int           { return len(a) }
+func (a BySortOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a BySortOrder) Less(i, j int) bool { return a[i].SortOrder < a[j].SortOrder }
 
 // -----------------------------------------------------------------------------
 
@@ -366,12 +374,14 @@ func (c *APISpecification) Load(specLocation string, specHost string) error {
 			// If API was populated (will not be if tags do not match), add to set
 			if !groupingByTag && len(api.Methods) > 0 {
 				logger.Tracef(nil, "    + Adding %s\n", name)
+				sort.Sort(BySortOrder(api.Methods))
 				c.APIs = append(c.APIs, *api) // All APIs (versioned within)
 			}
 		}
 
 		if groupingByTag && len(api.Methods) > 0 {
 			logger.Tracef(nil, "    + Adding %s\n", name)
+			sort.Sort(BySortOrder(api.Methods))
 			c.APIs = append(c.APIs, *api) // All APIs (versioned within)
 		}
 	}
@@ -584,6 +594,11 @@ func (c *APISpecification) processMethod(api *APIGroup, pathItem *spec.PathItem,
 		navigationName = o.Summary
 	}
 
+	sortOrder := o.Summary
+	if o.Extensions["x-sortOrder"] != nil {
+		sortOrder = "!" + o.Extensions["x-sortOrder"].(string)
+	}
+
 	method := &Method{
 		ID:             CamelToKebab(id),
 		Name:           o.Summary,
@@ -593,6 +608,7 @@ func (c *APISpecification) processMethod(api *APIGroup, pathItem *spec.PathItem,
 		Responses:      make(map[int]Response),
 		NavigationName: navigationName,
 		OperationName:  operationName,
+		SortOrder:      sortOrder,
 		APIGroup:       api,
 	}
 	if len(o.Consumes) > 0 {
