@@ -228,7 +228,9 @@ h1,
 }
 /* Sidebar navigation */
 .nav-sidebar {
- width: 100%;
+	width: 100%;
+	height: calc(97vh - 90px);
+	overflow-y: auto;
 }
 .nav-sidebar > li > a {
 	padding: 0.3em;
