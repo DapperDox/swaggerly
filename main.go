@@ -94,7 +94,11 @@ func main() {
 	specs.Register(router)
 	spec.LoadStatusCodes()
 
-	err = spec.LoadSpecifications(cfg.BindAddr, true)
+	if cfg.SpecURL != "" {
+		err = spec.LoadSpecification(cfg.SpecURL)
+	} else {
+		err = spec.LoadSpecifications(cfg.BindAddr, true)
+	}
 	if err != nil {
 		logger.Errorf(nil, "Load specification error: %s", err)
 		os.Exit(1)
