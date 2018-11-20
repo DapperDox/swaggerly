@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016-2017 dapperdox.com 
+Copyright (C) 2016-2017 dapperdox.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ type config struct {
 	BindAddr           string      `env:"BIND_ADDR" flag:"bind-addr" flagDesc:"Bind address"`
 	AssetsDir          string      `env:"ASSETS_DIR" flag:"assets-dir" flagDesc:"Assets to serve. Effectively the document root."`
 	DefaultAssetsDir   string      `env:"DEFAULT_ASSETS_DIR" flag:"default-assets-dir" flagDesc:"Default assets."`
+	SpecURL            string      `env:"SPEC_URL" flag:"spec-url" flagDesc:"OpenAPI specification (swagger) server url"`
 	SpecDir            string      `env:"SPEC_DIR" flag:"spec-dir" flagDesc:"OpenAPI specification (swagger) directory"`
 	SpecFilename       []string    `env:"SPEC_FILENAME" flag:"spec-filename" flagDesc:"The filename of the OpenAPI specification file within the spec-dir. May be multiply defined. Defaults to spec/swagger.json"`
 	Theme              string      `env:"THEME" flag:"theme" flagDesc:"Theme to render documentation"`
@@ -56,6 +57,7 @@ func Get() (*config, error) {
 	cfg = &config{
 		BindAddr:         "localhost:3123",
 		SpecDir:          "",
+		SpecURL:          "",
 		DefaultAssetsDir: "assets",
 		LogLevel:         "info",
 		SiteURL:          "http://localhost:3123/",

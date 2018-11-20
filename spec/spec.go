@@ -293,6 +293,28 @@ func LoadSpecifications(specHost string, collapse bool) error {
 	return nil
 }
 
+func LoadSpecification(specUrl string) error {
+	if APISuite == nil {
+		APISuite = make(map[string]*APISpecification)
+	}
+
+	var ok bool
+	var specification *APISpecification
+
+	if specification, ok = APISuite[""]; !ok {
+		specification = &APISpecification{}
+	}
+
+	var err = specification.Load(specUrl, "")
+	if err != nil {
+		return err
+	}
+
+	APISuite[specification.ID] = specification
+
+	return nil
+}
+
 // -----------------------------------------------------------------------------
 // Load loads API specs from the supplied host (usually local!)
 func (c *APISpecification) Load(specLocation string, specHost string) error {
@@ -386,10 +408,10 @@ func (c *APISpecification) Load(specLocation string, specHost string) error {
 		// If we're grouping by TAGs, then build the API at the tag level
 		if groupingByTag {
 			api = &APIGroup{
-				ID:   TitleToKebab(name),
-				Name: name,
-				URL:  u,
-				Info: &c.APIInfo,
+				ID:                     TitleToKebab(name),
+				Name:                   name,
+				URL:                    u,
+				Info:                   &c.APIInfo,
 				MethodNavigationByName: methodNavByName,
 				MethodSortBy:           methodSortBy,
 				Consumes:               apispec.Consumes,
@@ -407,10 +429,10 @@ func (c *APISpecification) Load(specLocation string, specHost string) error {
 			// If not grouping by tag, then build the API at the path level
 			if !groupingByTag {
 				api = &APIGroup{
-					ID:   TitleToKebab(name),
-					Name: name,
-					URL:  u,
-					Info: &c.APIInfo,
+					ID:                     TitleToKebab(name),
+					Name:                   name,
+					URL:                    u,
+					Info:                   &c.APIInfo,
 					MethodNavigationByName: methodNavByName,
 					MethodSortBy:           methodSortBy,
 					Consumes:               apispec.Consumes,
