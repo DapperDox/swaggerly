@@ -36,11 +36,13 @@ func Register(r *pat.Router) {
 	// Homepages for each loaded specification
 	var specification *spec.APISpecification // Ends up being populated with the last spec processed
 
+	cfg, _ := config.Get()
+
 	for _, specification = range spec.APISuite {
 
 		logger.Tracef(nil, "Build homepage route for specification '%s'", specification.ID)
 
-		r.Path("/" + specification.ID + "/reference").Methods("GET").HandlerFunc(specificationSummaryHandler(specification))
+		r.Path("/" + specification.ID+"/"+cfg.HomeRedirect).Methods("GET").HandlerFunc(specificationSummaryHandler(specification))
 
 		// If missingh trailing slash, redirect to add it
 		r.Path("/" + specification.ID).Methods("GET").HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -50,13 +52,11 @@ func Register(r *pat.Router) {
 		count++
 	}
 
-	cfg, _ := config.Get()
-
 	if count == 1 && cfg.ForceSpecList == false {
 		// If there is only one specification loaded, then hotwire '/' to redirect to the
 		// specification summary page unless DapperDox is configured to show the specification list page.
 		r.Path("/").Methods("GET").HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			http.Redirect(w, req, "/"+specification.ID+"/reference", 302)
+			http.Redirect(w, req, "/"+specification.ID+"/"+cfg.HomeRedirect, 302)
 		})
 	} else {
 		r.Path("/").Methods("GET").HandlerFunc(specificationListHandler)

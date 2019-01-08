@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016-2017 dapperdox.com 
+Copyright (C) 2016-2017 dapperdox.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ type config struct {
 	SpecRewriteURL     []string    `env:"SPEC_REWRITE_URL" flag:"spec-rewrite-url" flagDesc:"The URLs in the swagger specifications to be rewritten as site-url"`
 	DocumentRewriteURL []string    `env:"DOCUMENT_REWRITE_URL" flag:"document-rewrite-url" flagDesc:"Specify a document URL that is to be rewritten. May be multiply defined. Format is from=to."`
 	ForceSpecList      bool        `env:"FORCE_SPECIFICATION_LIST" flag:"force-specification-list" flagDesc:"Force the homepage to be the summary list of available specifications. The default when serving a single OpenAPI specification is to make the homepage the API summary."`
+	HomeRedirect       string      `env:"HOME_REDIRECT" flag:"home-redirect" flagDesc:"Where should home redirect to if there is only 1 specification"`
 	ShowAssets         bool        `env:"AUTHOR_SHOW_ASSETS" flag:"author-show-assets" flagDesc:"Display at the foot of each page the overlay asset paths, in priority order, that DapperDox will check before rendering."`
 	ProxyPath          []string    `env:"PROXY_PATH" flag:"proxy-path" flagDesc:"Give a path to proxy though to another service. May be multiply defined. Format is local-path=scheme://host/dst-path."`
 	TLSCertificate     string      `env:"TLS_CERTIFICATE" flag:"tls-certificate" flagDesc:"The fully qualified path to the TLS certificate file. For HTTP over TLS (HTTPS) both a certificate and a key must be provided."`
@@ -60,6 +61,7 @@ func Get() (*config, error) {
 		LogLevel:         "info",
 		SiteURL:          "http://localhost:3123/",
 		ShowAssets:       false,
+		HomeRedirect:     "reference",
 	}
 
 	err := gofigure.Gofigure(cfg)
