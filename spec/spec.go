@@ -1396,6 +1396,16 @@ func loadSpec(url string) (*loads.Document, error) {
 		return nil, err
 	}
 
+	// Because Title is required for resources but optional in the Open API spec, add the Title here for any definitions missing one
+	definitions := document.Spec().Definitions
+	for name, definition := range definitions {
+		if definition.Title == "" {
+			definition.Title = name
+			definitions[name] = definition
+			logger.Tracef(nil, "Definition for %s missing Title, setting Title to \"%s\"", name, definition.Title)
+		}
+	}
+	
 	//options := &spec.ExpandOptions{
 	//	RelativeBase: "/Users/csmith1/src/go/src/github.com/dapperdox/dapperdox-demo/specifications",
 	//}
