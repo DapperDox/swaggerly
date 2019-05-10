@@ -23,7 +23,7 @@ import (
 	"github.com/dapperdox/dapperdox/config"
 	"github.com/dapperdox/dapperdox/logger"
 	"github.com/dapperdox/dapperdox/render"
-	"github.com/dapperdox/dapperdox/spec"
+	"github.com/frinka/dapperdox/spec"
 	"github.com/gorilla/pat"
 )
 

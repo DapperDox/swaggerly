@@ -23,7 +23,7 @@ import (
 	//"github.com/davecgh/go-spew/spew"
 	"github.com/dapperdox/dapperdox/logger"
 	"github.com/dapperdox/dapperdox/render"
-	"github.com/dapperdox/dapperdox/spec"
+	"github.com/frinka/dapperdox/spec"
 	"github.com/gorilla/pat"
 )
 

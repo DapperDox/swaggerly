@@ -29,7 +29,7 @@ import (
 	"github.com/dapperdox/dapperdox/navigation"
 	"github.com/dapperdox/dapperdox/render"
 	"github.com/dapperdox/dapperdox/render/asset"
-	"github.com/dapperdox/dapperdox/spec"
+	"github.com/frinka/dapperdox/spec"
 	"github.com/gorilla/pat"
 )
 
