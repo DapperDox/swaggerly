@@ -21,9 +21,9 @@ import (
 	"net/http"
 
 	//"github.com/davecgh/go-spew/spew"
-	"github.com/dapperdox/dapperdox/logger"
-	"github.com/dapperdox/dapperdox/render"
-	"github.com/frinka/dapperdox/spec"
+	"dapperdox/logger"
+	"dapperdox/render"
+	"dapperdox/spec"
 	"github.com/gorilla/pat"
 )
 

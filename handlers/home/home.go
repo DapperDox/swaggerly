@@ -20,10 +20,10 @@ package home
 import (
 	"net/http"
 
-	"github.com/dapperdox/dapperdox/config"
-	"github.com/dapperdox/dapperdox/logger"
-	"github.com/dapperdox/dapperdox/render"
-	"github.com/frinka/dapperdox/spec"
+	"dapperdox/config"
+	"dapperdox/logger"
+	"dapperdox/render"
+	"dapperdox/spec"
 	"github.com/gorilla/pat"
 )
 

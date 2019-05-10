@@ -25,11 +25,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/dapperdox/dapperdox/logger"
-	"github.com/dapperdox/dapperdox/navigation"
-	"github.com/dapperdox/dapperdox/render"
-	"github.com/dapperdox/dapperdox/render/asset"
-	"github.com/frinka/dapperdox/spec"
+	"dapperdox/logger"
+	"dapperdox/navigation"
+	"dapperdox/render"
+	"dapperdox/render/asset"
+	"dapperdox/spec"
 	"github.com/gorilla/pat"
 )
 

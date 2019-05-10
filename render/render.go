@@ -25,11 +25,11 @@ import (
 	"strings"
 
 	//"github.com/davecgh/go-spew/spew"
-	"github.com/dapperdox/dapperdox/config"
-	"github.com/dapperdox/dapperdox/logger"
-	"github.com/dapperdox/dapperdox/navigation"
-	"github.com/dapperdox/dapperdox/render/asset"
-	"github.com/frinka/dapperdox/spec"
+	"dapperdox/config"
+	"dapperdox/logger"
+	"dapperdox/navigation"
+	"dapperdox/render/asset"
+	"dapperdox/spec"
 	"github.com/ian-kent/htmlform"
 	"github.com/unrolled/render"
 )

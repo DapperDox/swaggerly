@@ -19,8 +19,8 @@ package spec
 
 import (
 	"bufio"
-	"github.com/dapperdox/dapperdox/config"
-	"github.com/dapperdox/dapperdox/logger"
+	"dapperdox/config"
+	"dapperdox/logger"
 	"os"
 	"regexp"
 	"strconv"
