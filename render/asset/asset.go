@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016-2017 dapperdox.com 
+Copyright (C) 2016-2017 dapperdox.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,15 +28,17 @@ import (
 	"bytes"
 	"fmt"
 	"regexp"
+
 	//"github.com/davecgh/go-spew/spew"
-	"dapperdox/config"
-	"dapperdox/logger"
-	"github.com/shurcooL/github_flavored_markdown"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"unicode"
+
+	"github.com/frinka/dapperdox/config"
+	"github.com/frinka/dapperdox/logger"
+	"github.com/shurcooL/github_flavored_markdown"
 )
 
 var _bindata = map[string][]byte{}

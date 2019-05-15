@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016-2017 dapperdox.com 
+Copyright (C) 2016-2017 dapperdox.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@ import (
 	"strings"
 
 	//"github.com/davecgh/go-spew/spew"
-	"dapperdox/config"
-	"dapperdox/logger"
-	"dapperdox/navigation"
-	"dapperdox/render/asset"
-	"dapperdox/spec"
+	"github.com/frinka/dapperdox/config"
+	"github.com/frinka/dapperdox/logger"
+	"github.com/frinka/dapperdox/navigation"
+	"github.com/frinka/dapperdox/render/asset"
+	"github.com/frinka/dapperdox/spec"
 	"github.com/ian-kent/htmlform"
 	"github.com/unrolled/render"
 )

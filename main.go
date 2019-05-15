@@ -25,19 +25,19 @@ import (
 	"sync"
 	"time"
 
-	"dapperdox/spec"
+	"github.com/frinka/dapperdox/spec"
 
-	"dapperdox/config"
-	"dapperdox/handlers/guides"
-	"dapperdox/handlers/home"
-	"dapperdox/handlers/reference"
-	"dapperdox/handlers/specs"
-	"dapperdox/handlers/static"
-	"dapperdox/handlers/timeout"
-	"dapperdox/logger"
-	"dapperdox/network"
-	"dapperdox/proxy"
-	"dapperdox/render"
+	"github.com/frinka/dapperdox/config"
+	"github.com/frinka/dapperdox/handlers/guides"
+	"github.com/frinka/dapperdox/handlers/home"
+	"github.com/frinka/dapperdox/handlers/reference"
+	"github.com/frinka/dapperdox/handlers/specs"
+	"github.com/frinka/dapperdox/handlers/static"
+	"github.com/frinka/dapperdox/handlers/timeout"
+	"github.com/frinka/dapperdox/logger"
+	"github.com/frinka/dapperdox/network"
+	"github.com/frinka/dapperdox/proxy"
+	"github.com/frinka/dapperdox/render"
 
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
@@ -96,7 +96,12 @@ func main() {
 	specs.Register(router)
 	spec.LoadStatusCodes()
 
-	err = spec.LoadSpecifications(cfg.BindAddr, true)
+	if cfg.SpecURL != "" {
+		err = spec.LoadSpecification(cfg.SpecURL)
+	} else {
+		err = spec.LoadSpecifications(cfg.BindAddr, true)
+	}
+
 	if err != nil {
 		logger.Errorf(nil, "Load specification error: %s", err)
 		os.Exit(1)

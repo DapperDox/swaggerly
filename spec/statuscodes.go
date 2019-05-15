@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016-2017 dapperdox.com 
+Copyright (C) 2016-2017 dapperdox.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,11 +19,12 @@ package spec
 
 import (
 	"bufio"
-	"dapperdox/config"
-	"dapperdox/logger"
 	"os"
 	"regexp"
 	"strconv"
+
+	"github.com/frinka/dapperdox/config"
+	"github.com/frinka/dapperdox/logger"
 )
 
 var statusMapSplit = regexp.MustCompile(",")

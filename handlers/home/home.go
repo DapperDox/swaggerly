@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016-2017 dapperdox.com 
+Copyright (C) 2016-2017 dapperdox.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@ package home
 import (
 	"net/http"
 
-	"dapperdox/config"
-	"dapperdox/logger"
-	"dapperdox/render"
-	"dapperdox/spec"
+	"github.com/frinka/dapperdox/config"
+	"github.com/frinka/dapperdox/logger"
+	"github.com/frinka/dapperdox/render"
+	"github.com/frinka/dapperdox/spec"
 	"github.com/gorilla/pat"
 )
 
