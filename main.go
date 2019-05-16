@@ -25,24 +25,26 @@ import (
 	"sync"
 	"time"
 
-	"github.com/dapperdox/dapperdox/config"
-	"github.com/dapperdox/dapperdox/handlers/guides"
-	"github.com/dapperdox/dapperdox/handlers/home"
-	"github.com/dapperdox/dapperdox/handlers/reference"
-	"github.com/dapperdox/dapperdox/handlers/specs"
-	"github.com/dapperdox/dapperdox/handlers/static"
-	"github.com/dapperdox/dapperdox/handlers/timeout"
-	"github.com/dapperdox/dapperdox/logger"
-	"github.com/dapperdox/dapperdox/network"
-	"github.com/dapperdox/dapperdox/proxy"
-	"github.com/dapperdox/dapperdox/render"
-	"github.com/dapperdox/dapperdox/spec"
+	"github.com/frinka/dapperdox/spec"
+
+	"github.com/frinka/dapperdox/config"
+	"github.com/frinka/dapperdox/handlers/guides"
+	"github.com/frinka/dapperdox/handlers/home"
+	"github.com/frinka/dapperdox/handlers/reference"
+	"github.com/frinka/dapperdox/handlers/specs"
+	"github.com/frinka/dapperdox/handlers/static"
+	"github.com/frinka/dapperdox/handlers/timeout"
+	"github.com/frinka/dapperdox/logger"
+	"github.com/frinka/dapperdox/network"
+	"github.com/frinka/dapperdox/proxy"
+	"github.com/frinka/dapperdox/render"
+
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
 	"github.com/justinas/nosurf"
 )
 
-var VERSION string = "1.2.1"
+var VERSION string = "1.2.3"
 var tlsEnabled bool
 
 // ---------------------------------------------------------------------------
@@ -94,7 +96,12 @@ func main() {
 	specs.Register(router)
 	spec.LoadStatusCodes()
 
-	err = spec.LoadSpecifications(cfg.BindAddr, true)
+	if cfg.SpecURL != "" {
+		err = spec.LoadSpecification(cfg.SpecURL)
+	} else {
+		err = spec.LoadSpecifications(cfg.BindAddr, true)
+	}
+
 	if err != nil {
 		logger.Errorf(nil, "Load specification error: %s", err)
 		os.Exit(1)

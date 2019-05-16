@@ -1,4 +1,4 @@
 language: go
 go:
- - 1.7.3
- - tip
+ - "1.10.4"
+go_import_path: frinka/dapperdox

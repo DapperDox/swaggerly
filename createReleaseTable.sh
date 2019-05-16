@@ -23,5 +23,5 @@ do
     TARG=`echo $i | cut -d'.' -f4`
     OS=`echo $TARG | cut -d'-' -f1`
     ARCH=`echo $TARG | cut -d'-' -f2`
-    echo "[$i](https://github.com/DapperDox/dapperdox/releases/download/v$VERSION/$i) | ${OS} | ${ARCH} | ${SIZE} | ${SUM} |"
+    echo "[$i](https://github.com/frinka/dapperdox/releases/download/v$VERSION/$i) | ${OS} | ${ARCH} | ${SIZE} | ${SUM} |"
 done

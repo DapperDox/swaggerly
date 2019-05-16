@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016-2017 dapperdox.com 
+Copyright (C) 2016-2017 dapperdox.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/dapperdox/dapperdox/logger"
+	"github.com/frinka/dapperdox/logger"
+
 	"github.com/ian-kent/gofigure"
 )
 
@@ -32,6 +33,7 @@ type config struct {
 	DefaultAssetsDir   string      `env:"DEFAULT_ASSETS_DIR" flag:"default-assets-dir" flagDesc:"Default assets."`
 	SpecDir            string      `env:"SPEC_DIR" flag:"spec-dir" flagDesc:"OpenAPI specification (swagger) directory"`
 	SpecFilename       []string    `env:"SPEC_FILENAME" flag:"spec-filename" flagDesc:"The filename of the OpenAPI specification file within the spec-dir. May be multiply defined. Defaults to spec/swagger.json"`
+	SpecURL            string      `env:"SPEC_URL" flag:"spec-url" flagDesc:"OpenAPI specification (swagger) server url"`
 	Theme              string      `env:"THEME" flag:"theme" flagDesc:"Theme to render documentation"`
 	ThemeDir           string      `env:"THEME_DIR" flag:"theme-dir" flagDesc:"Directory containing installed themes"`
 	LogLevel           string      `env:"LOGLEVEL" flag:"log-level" flagDesc:"Log level"`
@@ -56,6 +58,7 @@ func Get() (*config, error) {
 	cfg = &config{
 		BindAddr:         "localhost:3123",
 		SpecDir:          "",
+		SpecURL:          "",
 		DefaultAssetsDir: "assets",
 		LogLevel:         "info",
 		SiteURL:          "http://localhost:3123/",
