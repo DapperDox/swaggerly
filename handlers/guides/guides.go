@@ -18,18 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package guides
 
 import (
-	//"github.com/davecgh/go-spew/spew"
 	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
-	"github.com/dapperdox/dapperdox/logger"
-	"github.com/dapperdox/dapperdox/navigation"
-	"github.com/dapperdox/dapperdox/render"
-	"github.com/dapperdox/dapperdox/render/asset"
-	"github.com/dapperdox/dapperdox/spec"
+	"github.com/DapperDox/dapperdox/logger"
+	"github.com/DapperDox/dapperdox/navigation"
+	"github.com/DapperDox/dapperdox/render"
+	"github.com/DapperDox/dapperdox/render/asset"
+	"github.com/DapperDox/dapperdox/spec"
 	"github.com/gorilla/pat"
 )
 

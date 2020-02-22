@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016-2017 dapperdox.com 
+Copyright (C) 2016-2017 dapperdox.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,12 +24,11 @@ import (
 	"net/http"
 	"strings"
 
-	//"github.com/davecgh/go-spew/spew"
-	"github.com/dapperdox/dapperdox/config"
-	"github.com/dapperdox/dapperdox/logger"
-	"github.com/dapperdox/dapperdox/navigation"
-	"github.com/dapperdox/dapperdox/render/asset"
-	"github.com/dapperdox/dapperdox/spec"
+	"github.com/DapperDox/dapperdox/config"
+	"github.com/DapperDox/dapperdox/logger"
+	"github.com/DapperDox/dapperdox/navigation"
+	"github.com/DapperDox/dapperdox/render/asset"
+	"github.com/DapperDox/dapperdox/spec"
 	"github.com/ian-kent/htmlform"
 	"github.com/unrolled/render"
 )
@@ -96,7 +95,7 @@ func New() *render.Render {
 		Directory:  "assets/templates",
 		Delims:     render.Delims{Left: "[:", Right: ":]"},
 		Layout:     "layout",
-		Funcs: []template.FuncMap{template.FuncMap{
+		Funcs: []template.FuncMap{{
 			"map":           htmlform.Map,
 			"ext":           htmlform.Extend,
 			"fnn":           htmlform.FirstNotNil,

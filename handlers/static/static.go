@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016-2017 dapperdox.com 
+Copyright (C) 2016-2017 dapperdox.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,10 +23,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	//"github.com/dapperdox/dapperdox/assets"
-	"github.com/dapperdox/dapperdox/logger"
-	"github.com/dapperdox/dapperdox/render"
-	"github.com/dapperdox/dapperdox/render/asset"
+	"github.com/DapperDox/dapperdox/logger"
+	"github.com/DapperDox/dapperdox/render"
+	"github.com/DapperDox/dapperdox/render/asset"
 	"github.com/gorilla/pat"
 )
 

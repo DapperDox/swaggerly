@@ -27,9 +27,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/dapperdox/dapperdox/config"
-	"github.com/dapperdox/dapperdox/logger"
-	//"github.com/davecgh/go-spew/spew"
+	"github.com/DapperDox/dapperdox/config"
+	"github.com/DapperDox/dapperdox/logger"
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/spec"
 	"github.com/serenize/snaker"
@@ -386,10 +385,10 @@ func (c *APISpecification) Load(specLocation string, specHost string) error {
 		// If we're grouping by TAGs, then build the API at the tag level
 		if groupingByTag {
 			api = &APIGroup{
-				ID:   TitleToKebab(name),
-				Name: name,
-				URL:  u,
-				Info: &c.APIInfo,
+				ID:                     TitleToKebab(name),
+				Name:                   name,
+				URL:                    u,
+				Info:                   &c.APIInfo,
 				MethodNavigationByName: methodNavByName,
 				MethodSortBy:           methodSortBy,
 				Consumes:               apispec.Consumes,
@@ -407,10 +406,10 @@ func (c *APISpecification) Load(specLocation string, specHost string) error {
 			// If not grouping by tag, then build the API at the path level
 			if !groupingByTag {
 				api = &APIGroup{
-					ID:   TitleToKebab(name),
-					Name: name,
-					URL:  u,
-					Info: &c.APIInfo,
+					ID:                     TitleToKebab(name),
+					Name:                   name,
+					URL:                    u,
+					Info:                   &c.APIInfo,
 					MethodNavigationByName: methodNavByName,
 					MethodSortBy:           methodSortBy,
 					Consumes:               apispec.Consumes,
@@ -446,7 +445,7 @@ func (c *APISpecification) Load(specLocation string, specHost string) error {
 
 	// Build a API map, grouping by version
 	for _, api := range c.APIs {
-		for v, _ := range api.Versions {
+		for v := range api.Versions {
 			if c.APIVersions == nil {
 				c.APIVersions = make(map[string]APISet)
 			}
@@ -1397,7 +1396,7 @@ func loadSpec(url string) (*loads.Document, error) {
 	}
 
 	//options := &spec.ExpandOptions{
-	//	RelativeBase: "/Users/csmith1/src/go/src/github.com/dapperdox/dapperdox-demo/specifications",
+	//	RelativeBase: "/Users/csmith1/src/go/src/github.com/DapperDox/dapperdox-demo/specifications",
 	//}
 
 	// TODO Allow relative references https://github.com/go-openapi/spec/issues/14
