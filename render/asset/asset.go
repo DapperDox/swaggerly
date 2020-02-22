@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016-2017 dapperdox.com 
+Copyright (C) 2016-2017 dapperdox.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,16 +27,16 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"regexp"
-	//"github.com/davecgh/go-spew/spew"
-	"github.com/dapperdox/dapperdox/config"
-	"github.com/dapperdox/dapperdox/logger"
-	"github.com/shurcooL/github_flavored_markdown"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"unicode"
+
+	"github.com/DapperDox/dapperdox/config"
+	"github.com/DapperDox/dapperdox/logger"
+	"github.com/shurcooL/github_flavored_markdown"
 )
 
 var _bindata = map[string][]byte{}
@@ -291,7 +291,7 @@ func splitOnSection(text string) ([]string, []string) {
 
 		last = element[1]
 	}
-	sections[len(indexes)-1] = text[last:len(text)]
+	sections[len(indexes)-1] = text[last:]
 
 	return sections, headings
 }
