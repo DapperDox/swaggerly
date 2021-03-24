@@ -1,0 +1,24 @@
+securityDefinitions:
+  token:
+    type: oauth2
+    tokenUrl: https://cloudsso.cisco.com/as/token.oauth2
+    flow: password
+    scopes:
+      tenant:admin: Tenant Administrator
+      tenant:operator: Tenant Operator
+      tenant:view: Tenant View
+      servicegroup:admin: Service Group Admin
+      servicegroup:operator: Service Group Operator
+      servicegroup:view: Service Group View
+      funds:admin: Funds Admin
+
+security:
+  - token: []
+
+x-navigateMethodsByName: true
+x-sortMethodsBy:
+  - operation
+  - path
+
+schemes:
+  - https

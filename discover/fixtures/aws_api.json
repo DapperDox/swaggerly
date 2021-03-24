@@ -1,0 +1,1073 @@
+{
+  "produces": [
+    "application/vnd.cia.v1+json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Manages provisioning of AWS resources",
+    "title": "AWS Service",
+    "version": "0.18.0"
+  },
+  "basePath": "/v1",
+  "paths": {
+    "/aws/accounts": {
+      "get": {
+        "description": "Retrieves a filtered list of accounts.",
+        "tags": [
+          "aws"
+        ],
+        "summary": "List Accounts",
+        "operationId": "listAccounts",
+        "parameters": [
+          {
+            "minLength": 3,
+            "type": "string",
+            "description": "Search account by name",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Search acccount by email",
+            "name": "email",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "NONPROD",
+              "PROD"
+            ],
+            "type": "string",
+            "description": "Search acccount by lifecycle",
+            "name": "lifecycle",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "NEW",
+              "ACTIVE",
+              "FAILED",
+              "CREATING",
+              "UPDATING",
+              "DELETING"
+            ],
+            "type": "string",
+            "description": "Search accounts by status",
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filters the fields in each returned record. (comma-delimited)",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Max number of records to return.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Segment of records to return incremented by limit.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "pattern": "[-]?\\w+",
+              "type": "string"
+            },
+            "description": "Sort by fields that determines the order of the results. (comma-delimited)",
+            "name": "sort",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List all accounts matching the specified criteria",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/account_view"
+              }
+            },
+            "headers": {
+              "Link": {
+                "type": "string",
+                "description": "Pagination links"
+              },
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifer associated with request"
+              },
+              "X-Total-Count": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Total number of results (if known)"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "post": {
+        "description": "Create an AWS Account in AWS Orgnization",
+        "consumes": [
+          "application/vnd.cia.v1+json"
+        ],
+        "tags": [
+          "aws"
+        ],
+        "summary": "Create AWS Account",
+        "operationId": "createAccount",
+        "parameters": [
+          {
+            "description": "AWS account details",
+            "name": "Account",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/account"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Account created successfully",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "id of the newly created account"
+              },
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifer associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "402": {
+            "$ref": "#/responses/402"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "409": {
+            "$ref": "#/responses/409"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Parent tenant ID",
+          "name": "X-Tenant-Id",
+          "in": "header",
+          "required": true
+        }
+      ]
+    },
+    "/aws/accounts/{accountId}": {
+      "get": {
+        "description": "View an account by accountId",
+        "tags": [
+          "aws"
+        ],
+        "summary": "Get Account",
+        "operationId": "viewAccount",
+        "responses": {
+          "200": {
+            "description": "Account details",
+            "schema": {
+              "$ref": "#/definitions/account_view"
+            },
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifer associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete the AWS account",
+        "tags": [
+          "aws"
+        ],
+        "summary": "Delete account",
+        "operationId": "deleteAccount",
+        "responses": {
+          "204": {
+            "description": "Account deleted",
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifer associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "409": {
+            "$ref": "#/responses/409"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "patch": {
+        "description": "Update an existing account",
+        "consumes": [
+          "application/vnd.cia.v1+json"
+        ],
+        "tags": [
+          "aws"
+        ],
+        "summary": "Update account",
+        "operationId": "updateAccount",
+        "parameters": [
+          {
+            "description": "Account details to update",
+            "name": "account_partial",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/account_partial"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Account update accepted.",
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifer associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "402": {
+            "$ref": "#/responses/402"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "409": {
+            "$ref": "#/responses/409"
+          },
+          "422": {
+            "$ref": "#/responses/422"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unqiue ID of the account",
+          "name": "accountId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Parent tenant ID",
+          "name": "X-Tenant-Id",
+          "in": "header",
+          "required": true
+        }
+      ]
+    },
+    "/aws/workflows/{accountId}": {
+      "x-visibility": "private",
+      "patch": {
+        "security": [],
+        "description": "Update workflow for an existing account",
+        "consumes": [
+          "application/vnd.cia.v1+json"
+        ],
+        "tags": [
+          "aws"
+        ],
+        "summary": "Update workflow",
+        "operationId": "updateWorkflow",
+        "parameters": [
+          {
+            "description": "Workflow Operation",
+            "name": "workflow",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/workflow"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Workflow operation accepted.",
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifer associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unqiue ID of the account",
+          "name": "accountId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Parent tenant ID",
+          "name": "X-Tenant-Id",
+          "in": "header",
+          "required": true
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "account": {
+      "description": "AWS Account Details",
+      "type": "object",
+      "title": "Account",
+      "required": [
+        "name",
+        "email",
+        "estimated_cost",
+        "lifecycle",
+        "user_attribution"
+      ],
+      "properties": {
+        "audit": {
+          "$ref": "#/definitions/audit"
+        },
+        "cloud_registration_id": {
+          "description": "Cloud Registration Id of a production account",
+          "type": "string",
+          "title": "Cloud Registration Id",
+          "example": "abc123"
+        },
+        "email": {
+          "description": "Email alias (no individual email addresses) for the account.\nMust be configured to receive emails from external senders.\n",
+          "type": "string",
+          "format": "email",
+          "title": "Email",
+          "example": "team_or_group_email@cisco.com"
+        },
+        "estimated_cost": {
+          "description": "An estimated cost (amount) to allocate for an AWS account",
+          "type": "number",
+          "format": "double",
+          "title": "Estimated Cost",
+          "example": 1230.456
+        },
+        "id": {
+          "description": "Unique ID identifying the account",
+          "type": "string",
+          "format": "uuid",
+          "title": "Account ID",
+          "readOnly": true,
+          "example": "1234f6e7-dd55-4639-bc54-65646fde2adc"
+        },
+        "lifecycle": {
+          "description": "Lifcycle of an account",
+          "type": "string",
+          "title": "Lifecycle",
+          "enum": [
+            "NONPROD",
+            "PROD"
+          ],
+          "example": "PROD"
+        },
+        "metadata": {
+          "description": "Metadata associated with the account",
+          "type": "object",
+          "title": "Metadata",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "readOnly": true
+        },
+        "name": {
+          "description": "Name of the account",
+          "type": "string",
+          "title": "Account Name",
+          "example": "My Dev Account"
+        },
+        "status": {
+          "description": "Status of the account",
+          "type": "string",
+          "title": "Account Status",
+          "enum": [
+            "NEW",
+            "ACTIVE",
+            "FAILED",
+            "CREATING",
+            "UPDATING",
+            "DELETING"
+          ],
+          "readOnly": true,
+          "example": "ACTIVE"
+        },
+        "tags": {
+          "description": "Tags associated with the account",
+          "type": "array",
+          "title": "Tags",
+          "items": {
+            "type": "string"
+          },
+          "x-omitempty": true,
+          "example": [
+            "build",
+            "jenkins"
+          ]
+        },
+        "user_attribution": {
+          "$ref": "#/definitions/user_attribution"
+        }
+      }
+    },
+    "account_partial": {
+      "description": "Partial account captures fields for account updates",
+      "type": "object",
+      "title": "Partial account",
+      "properties": {
+        "cloud_registration_id": {
+          "description": "Cloud Registration Id of an AWS account",
+          "type": "string",
+          "title": "Cloud Registration Id",
+          "example": "abc123"
+        },
+        "estimated_cost": {
+          "description": "An estimated cost (amount) to allocate for an AWS account",
+          "type": "number",
+          "format": "double",
+          "title": "Estimated Cost",
+          "example": 1230.456
+        },
+        "lifecycle": {
+          "description": "Lifecycle of an AWS account",
+          "type": "string",
+          "title": "Lifecycle",
+          "enum": [
+            "NONPROD",
+            "PROD"
+          ],
+          "example": "PROD"
+        },
+        "status": {
+          "description": "cancel the approval request by passing status CANCELED",
+          "type": "string",
+          "title": "account status",
+          "enum": [
+            "CANCELED"
+          ]
+        },
+        "user_attribution": {
+          "description": "User Attribution for an AWS account",
+          "type": "object",
+          "title": "User Attribution",
+          "properties": {
+            "business_application_name": {
+              "description": "Business Application Name",
+              "type": "string",
+              "title": "Business Application Name",
+              "x-nullable": true
+            },
+            "business_contact": {
+              "description": "Business contact for this AWS account",
+              "type": "string",
+              "format": "email",
+              "title": "Business Contact",
+              "x-nullable": true
+            },
+            "data_classification": {
+              "description": "Technical contact for this AWS account",
+              "type": "string",
+              "title": "Data Classification",
+              "enum": [
+                "CONFIDENTIAL",
+                "HIGHLYCONFIDENTIAL",
+                "PUBLIC",
+                "RESTRICTED"
+              ],
+              "x-nullable": true
+            },
+            "technical_contact": {
+              "description": "Technical contact for this AWS account",
+              "type": "string",
+              "format": "email",
+              "title": "Technical Contact",
+              "x-nullable": true
+            }
+          }
+        }
+      }
+    },
+    "account_view": {
+      "description": "AWS Account view",
+      "type": "object",
+      "title": "Account View",
+      "properties": {
+        "audit": {
+          "$ref": "#/definitions/audit"
+        },
+        "cloud_registration_id": {
+          "description": "Cloud Registration Id for a production account",
+          "type": "string",
+          "title": "Cloud Registration Id",
+          "readOnly": true,
+          "example": "abc123"
+        },
+        "email": {
+          "description": "Email alias (no individual email addresses) for the account.\nMust be configured to receive emails from external senders.\n",
+          "type": "string",
+          "title": "Email",
+          "readOnly": true,
+          "example": "team_or_group_email@cisco.com"
+        },
+        "estimated_cost": {
+          "description": "Estimated Cost of an AWS account",
+          "type": "number",
+          "format": "double",
+          "title": "Estimated Cost",
+          "readOnly": true,
+          "example": 1230.456
+        },
+        "id": {
+          "description": "Unique ID identifying the account",
+          "type": "string",
+          "format": "uuid",
+          "title": "Account ID",
+          "readOnly": true,
+          "example": "1234f6e7-dd55-4639-bc54-65646fde2adc"
+        },
+        "lifecycle": {
+          "description": "Lifcycle of an account",
+          "type": "string",
+          "title": "Lifecycle",
+          "enum": [
+            "NONPROD",
+            "PROD"
+          ],
+          "readOnly": true,
+          "example": "PROD"
+        },
+        "metadata": {
+          "description": "Metadata associated with the account",
+          "type": "object",
+          "title": "Metadata",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "readOnly": true
+        },
+        "name": {
+          "description": "Name of the account",
+          "type": "string",
+          "title": "Account Name",
+          "readOnly": true,
+          "example": "Sample AWS Account"
+        },
+        "status": {
+          "description": "Status of the account",
+          "type": "string",
+          "title": "Account Status",
+          "enum": [
+            "NEW",
+            "ACTIVE",
+            "FAILED",
+            "CREATING",
+            "UPDATING",
+            "DELETING"
+          ],
+          "readOnly": true,
+          "example": "ACTIVE"
+        },
+        "tags": {
+          "description": "Tags associated with the account",
+          "type": "array",
+          "title": "Tags",
+          "items": {
+            "type": "string"
+          },
+          "x-omitempty": true,
+          "readOnly": true,
+          "example": [
+            "build",
+            "jenkins"
+          ]
+        },
+        "user_attribution": {
+          "$ref": "#/definitions/user_attribution"
+        }
+      }
+    },
+    "audit": {
+      "description": "Audit trail details",
+      "type": "object",
+      "title": "Audit",
+      "properties": {
+        "created_at": {
+          "description": "timestamp when the record was created",
+          "type": "string",
+          "format": "date-time",
+          "title": "Created At",
+          "readOnly": true
+        },
+        "created_by": {
+          "description": "entity that created the record",
+          "type": "string",
+          "title": "Created By",
+          "readOnly": true,
+          "example": "user-cec"
+        },
+        "updated_at": {
+          "description": "timestamp when the record was updated",
+          "type": "string",
+          "format": "date-time",
+          "title": "Updated At",
+          "readOnly": true
+        },
+        "updated_by": {
+          "description": "entity that updated the record",
+          "type": "string",
+          "title": "Updated By",
+          "readOnly": true,
+          "example": "user-cec"
+        }
+      }
+    },
+    "error": {
+      "description": "An error provides information about why the request failed.\n",
+      "type": "object",
+      "title": "Error",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "description": "Code identifies a specific type of error.\n",
+          "type": "string",
+          "title": "Code"
+        },
+        "message": {
+          "description": "The message provides details about the failure.\n",
+          "type": "string",
+          "title": "Message"
+        }
+      }
+    },
+    "user": {
+      "description": "A User is the authenticated person performing actions.\n",
+      "type": "object",
+      "title": "User Structure",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "client_id": {
+          "description": "client_id is created via PingID",
+          "type": "string",
+          "title": "oauth2 client_id"
+        },
+        "display": {
+          "description": "formal name used when greeting a person",
+          "type": "string",
+          "title": "display name"
+        },
+        "name": {
+          "description": "human readable identifier",
+          "type": "string",
+          "title": "login name"
+        },
+        "token": {
+          "description": "token used during authentication",
+          "type": "string",
+          "title": "authentication token"
+        }
+      },
+      "x-visibility": "private"
+    },
+    "user_attribution": {
+      "description": "User Attribution for Cloud Account",
+      "type": "object",
+      "title": "User Attribution",
+      "required": [
+        "business_application_name",
+        "business_contact",
+        "technical_contact"
+      ],
+      "properties": {
+        "business_application_name": {
+          "description": "Business Application Name",
+          "type": "string",
+          "title": "Business Application Name",
+          "x-nullable": true
+        },
+        "business_contact": {
+          "description": "Business contact for this Cloud Account",
+          "type": "string",
+          "format": "email",
+          "title": "Business Contact",
+          "x-nullable": true
+        },
+        "data_classification": {
+          "description": "Technical contact for this Cloud Account",
+          "type": "string",
+          "title": "Data Classification",
+          "enum": [
+            "CONFIDENTIAL",
+            "HIGHLYCONFIDENTIAL",
+            "PUBLIC",
+            "RESTRICTED"
+          ],
+          "x-nullable": true
+        },
+        "technical_contact": {
+          "description": "Technical contact for this Cloud Account",
+          "type": "string",
+          "format": "email",
+          "title": "Technical Contact",
+          "x-nullable": true
+        }
+      }
+    },
+    "workflow": {
+      "description": "Workflow operations to perform",
+      "type": "object",
+      "title": "Workflow",
+      "required": [
+        "operation"
+      ],
+      "properties": {
+        "operation": {
+          "description": "Operation to perform on workflow",
+          "type": "string",
+          "title": "Operation",
+          "enum": [
+            "CREATE_RESTART",
+            "REPUBLISH_EVENT"
+          ],
+          "example": "CREATE_RESTART"
+        }
+      },
+      "x-visibility": "private"
+    }
+  },
+  "responses": {
+    "400": {
+      "description": "Invalid Request Error. Check error message in the response body for details.\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-001",
+          "message": "Missing required attribute 'name'."
+        }
+      }
+    },
+    "401": {
+      "description": "Authentication Failure\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-002",
+          "message": "Authentication failed bad password."
+        }
+      }
+    },
+    "402": {
+      "description": "Insufficient Funds\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-003",
+          "message": "Insufficient Funds to cover the cost of resource."
+        }
+      }
+    },
+    "403": {
+      "description": "Authorization Failure\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-004",
+          "message": "Not authorized to perform action."
+        }
+      }
+    },
+    "404": {
+      "description": "Resource not found\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-005",
+          "message": "Resource \u003cid\u003e does not exist."
+        }
+      }
+    },
+    "409": {
+      "description": "Conflict\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-006",
+          "message": "Resource already exists."
+        }
+      }
+    },
+    "422": {
+      "description": "Unprocessable Entity Failure\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-007",
+          "message": "Resource is not able to be updated."
+        }
+      }
+    },
+    "500": {
+      "description": "Internal Server Error. Check error entity in the response body for details.\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-009",
+          "message": "Internal server error."
+        }
+      }
+    },
+    "503": {
+      "description": "Service Unavailable\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-010",
+          "message": "Service Unavailable."
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "token": {
+      "type": "apiKey",
+      "name": "WAMAUTH",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "token": []
+    }
+  ],
+  "tags": [
+    {
+      "description": "AWS Account Operations",
+      "name": "aws"
+    }
+  ],
+  "x-mcmp-component-type": "public-cloud"
+}

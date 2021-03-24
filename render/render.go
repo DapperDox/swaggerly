@@ -50,7 +50,7 @@ var (
 func Register() {
 	log().Debug("initializing Render")
 
-	_render = new()
+	_render = newRender()
 }
 
 // HTML is an alias to github.com/unrolled/render.Render.HTML.
@@ -63,7 +63,7 @@ func TemplateLookup(t string) *template.Template {
 	return _render.TemplateLookup(t)
 }
 
-func new() *render.Render {
+func newRender() *render.Render {
 	log().Trace("creating instance of render.Render")
 
 	asset.CompileGFMMap()
@@ -185,7 +185,7 @@ func overlayFunc(name string, data []interface{}) template.HTML { // TODO Will b
 			writer := htmlWriter{h: bufio.NewWriter(&b)}
 
 			// data is a single item array (though I've not figured out why yet!)
-			_ = new().HTML(writer, http.StatusOK, op, data[0], render.HTMLOptions{Layout: ""})
+			_ = newRender().HTML(writer, http.StatusOK, op, data[0], render.HTMLOptions{Layout: ""})
 			writer.Flush()
 
 			break
@@ -230,7 +230,7 @@ func overlayPaths(name string, datamap map[string]interface{}) []string {
 }
 
 func getAssetPaths(_ string, data []interface{}) []string {
-	datamap := data[0].(map[string]interface{})
+	datamap, _ := data[0].(map[string]interface{})
 
 	var paths []string
 
@@ -294,7 +294,7 @@ func getOverlayStems(overlayAsset string) *overlayStems {
 }
 
 func getMethodAssetPaths(overlayAsset string, paths *[]string, datamap map[string]interface{}) {
-	method := datamap["Method"].(spec.Method)
+	method, _ := datamap["Method"].(spec.Method)
 	apiID := method.APIGroup.ID
 
 	a := getOverlayStems(overlayAsset)

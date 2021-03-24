@@ -1,0 +1,1200 @@
+{
+  "produces": [
+    "application/vnd.cia.v1+json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Manages Approvals process",
+    "title": "Approvals",
+    "version": "0.11.0"
+  },
+  "basePath": "/v2",
+  "paths": {
+    "/approvals": {
+      "get": {
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "description": "Retrieves a filtered list of approvals. The default filter is based on authenticated user access.\nEach additional filter will reduce the result list further.\n\nTo reduce the overall size of the response payload the fields can be limited.\n",
+        "tags": [
+          "approvals"
+        ],
+        "summary": "List Approvals",
+        "operationId": "listApprovals",
+        "parameters": [
+          {
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ],
+            "type": "string",
+            "description": "Search approvals by status",
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "QUOTA",
+              "FUND",
+              "CONFLICT",
+              "OWNERSHIP"
+            ],
+            "type": "string",
+            "description": "Search Approvals by type",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filters the fields in each returned record. (comma-delimited)",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Max number of records to return.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Segment of records to return incremented by limit.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "pattern": "([-\\+]\\w+)",
+              "type": "string"
+            },
+            "description": "Sort by fields that determines the order of the results. (comma-delimited)",
+            "name": "sort",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List all Approvals matching the specified criteria",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/approval_view"
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "internal": []
+          }
+        ],
+        "description": "Create an Approval request to managing quota Approval process\n",
+        "consumes": [
+          "application/vnd.cia.v1+json"
+        ],
+        "tags": [
+          "approvals"
+        ],
+        "summary": "Create Approval Request",
+        "operationId": "createApproval",
+        "parameters": [
+          {
+            "description": "Approval details",
+            "name": "Approval",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/approval"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Approval Request Created",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "URL to the newly created Approval request"
+              },
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        },
+        "x-visibility": "private"
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        }
+      ]
+    },
+    "/approvals/delegations": {
+      "post": {
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "description": "Create a Delegate request to managing approver delegations process\n",
+        "consumes": [
+          "application/vnd.cia.v1+json"
+        ],
+        "tags": [
+          "approvals"
+        ],
+        "summary": "Create Delegate Request",
+        "operationId": "createDelegate",
+        "parameters": [
+          {
+            "description": "delegate details",
+            "name": "delegate",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/delegate"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Delegate Request Created",
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifer associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        }
+      ]
+    },
+    "/approvals/{approvalId}": {
+      "get": {
+        "security": [
+          {
+            "token": []
+          },
+          {
+            "internal": []
+          }
+        ],
+        "description": "Retrieves an Approval by ID",
+        "tags": [
+          "approvals"
+        ],
+        "summary": "View Approval",
+        "operationId": "viewApproval",
+        "responses": {
+          "200": {
+            "description": "Approval",
+            "schema": {
+              "$ref": "#/definitions/approval_view"
+            },
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "internal": []
+          },
+          {
+            "token": []
+          }
+        ],
+        "description": "Cancel the Approval request",
+        "tags": [
+          "approvals"
+        ],
+        "summary": "Cancel Approval",
+        "operationId": "cancelApproval",
+        "parameters": [
+          {
+            "type": "boolean",
+            "default": true,
+            "description": "Flag to determine whether to send notification or not.",
+            "name": "notification_enabled",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Approval Canceled",
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "409": {
+            "$ref": "#/responses/409"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        },
+        "x-visibility": "private"
+      },
+      "patch": {
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "description": "Applies changes to an Approval.",
+        "consumes": [
+          "application/vnd.cia.v1+json"
+        ],
+        "tags": [
+          "approvals"
+        ],
+        "summary": "Update Approval",
+        "operationId": "updateApproval",
+        "parameters": [
+          {
+            "description": "Body of Approval",
+            "name": "approval_partial",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/approval_partial"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Approval",
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "422": {
+            "$ref": "#/responses/422"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier for Approval",
+          "name": "approvalId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "approval": {
+      "description": "An Approval record",
+      "type": "object",
+      "title": "Approval",
+      "required": [
+        "type",
+        "approvers",
+        "requester",
+        "entity_id",
+        "tenant_id",
+        "tenant_name",
+        "entity_uri",
+        "data",
+        "service"
+      ],
+      "properties": {
+        "account_id": {
+          "description": "Unique identifier of the account",
+          "type": "string",
+          "format": "uuid",
+          "title": "Account identifier",
+          "example": "3b56cdda-7b2b-11eb-9439-0242ac130002"
+        },
+        "account_name": {
+          "description": "Name of the account",
+          "type": "string",
+          "title": "Account name",
+          "example": "test-ac-name"
+        },
+        "approval_notes": {
+          "description": "Notes to elaborate approval/rejection reasons",
+          "type": "string",
+          "title": "Request Approval notes",
+          "readOnly": true,
+          "example": "Rejected due to higher requested quota"
+        },
+        "approver_mailer_alias": {
+          "description": "Approver Mailer Alias - deprecated",
+          "type": "string",
+          "title": "Approver Mailer Alias",
+          "example": "mcmp_central_funding"
+        },
+        "approver_mailer_aliases": {
+          "description": "Approver Mailer Alias List",
+          "type": "array",
+          "title": "Approver Mailer Aliases",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "abc@cisco.com",
+            "xyz@cisco.com"
+          ]
+        },
+        "approvers": {
+          "description": "Approvers of this Approval request",
+          "type": "array",
+          "title": "Approvers",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "mcmp_central_funding1",
+            "mcmp_central_funding2"
+          ]
+        },
+        "audit": {
+          "$ref": "#/definitions/audit"
+        },
+        "data": {
+          "$ref": "#/definitions/data"
+        },
+        "entity_classifier": {
+          "description": "type of the underlying entity",
+          "type": "string",
+          "title": "Entity Classifier",
+          "example": "Project"
+        },
+        "entity_id": {
+          "description": "Unique identifier for the Entity",
+          "type": "string",
+          "format": "uuid",
+          "title": "Entity Identifier",
+          "example": "3377f6e7-dd55-4639-bc54-65646fde2ade"
+        },
+        "entity_name": {
+          "description": "Name of the underlying entity",
+          "type": "string",
+          "title": "Entity Name",
+          "example": "test-openshift-project"
+        },
+        "entity_uri": {
+          "description": "entity_uri of this approvals",
+          "type": "string",
+          "title": "Entity URI",
+          "example": "/resources/3377f6e7-dd55-4639-bc54-65646fde2adc"
+        },
+        "id": {
+          "description": "Unique identifier for the Approvals",
+          "type": "string",
+          "format": "uuid",
+          "title": "Approval Identifier",
+          "readOnly": true,
+          "example": "15795956-d322-11e8-a8d5-f2801f1b9fd1"
+        },
+        "metadata": {
+          "description": "Metadata associated with the Approval",
+          "type": "object",
+          "title": "Metadata",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "requester": {
+          "description": "Requester of this Approval request",
+          "type": "string",
+          "title": "requester",
+          "example": "user-cec"
+        },
+        "service": {
+          "description": "Service name that request Approval",
+          "type": "string",
+          "title": "Service",
+          "example": "Openstack"
+        },
+        "servicegroup_id": {
+          "description": "Unique identifier for the Service Group",
+          "type": "string",
+          "format": "uuid",
+          "title": "Service Group Identifier",
+          "example": "4677f6e7-dd55-4639-bc54-65646fde2adc"
+        },
+        "servicegroup_name": {
+          "description": "Name for the Service Group",
+          "type": "string",
+          "title": "Service Group Name",
+          "example": "test-sg-name"
+        },
+        "status": {
+          "description": "Status to indicate if resource is approved",
+          "type": "string",
+          "title": "Approval status",
+          "enum": [
+            "PENDING",
+            "APPROVED",
+            "REJECTED"
+          ],
+          "readOnly": true,
+          "example": "APPROVED"
+        },
+        "tenant_id": {
+          "description": "Unique identifier for the tenant",
+          "type": "string",
+          "format": "uuid",
+          "title": "Tenant Identifier",
+          "example": "3377f6e7-dd55-4639-bc54-65646fde2adc"
+        },
+        "tenant_name": {
+          "description": "Name of the tenant",
+          "type": "string",
+          "title": "Tenant Name",
+          "example": "test-t-name"
+        },
+        "type": {
+          "description": "Type to indicate the Approval type",
+          "type": "string",
+          "title": "Approval Type",
+          "enum": [
+            "QUOTA",
+            "FUND",
+            "CONFLICT",
+            "OWNERSHIP"
+          ],
+          "example": "QUOTA"
+        }
+      }
+    },
+    "approval_partial": {
+      "description": "The attributes of Approval that are able to modified.",
+      "type": "object",
+      "title": "Partial Approval",
+      "properties": {
+        "approval_notes": {
+          "description": "Notes to elaborate approval/rejection reasons",
+          "type": "string",
+          "title": "Request Approval notes",
+          "example": "Rejected due to higher requested quota"
+        },
+        "status": {
+          "description": "Status to indicate if request is approved",
+          "type": "string",
+          "title": "Approval status",
+          "enum": [
+            "APPROVED",
+            "REJECTED"
+          ],
+          "example": "APPROVED"
+        }
+      }
+    },
+    "approval_view": {
+      "description": "An approval view record",
+      "type": "object",
+      "title": "Approval view",
+      "properties": {
+        "account_id": {
+          "description": "Unique identifier of the account",
+          "type": "string",
+          "format": "uuid",
+          "title": "Account identifier",
+          "readOnly": true,
+          "example": "3b56cdda-7b2b-11eb-9439-0242ac130002"
+        },
+        "account_name": {
+          "description": "Name of the account",
+          "type": "string",
+          "title": "Account name",
+          "readOnly": true,
+          "example": "test-ac-name"
+        },
+        "approval_notes": {
+          "description": "Notes to elaborate approval/rejection reasons",
+          "type": "string",
+          "title": "Request approval notes",
+          "readOnly": true,
+          "example": "Rejected due to higher requested quota"
+        },
+        "approver_mailer_alias": {
+          "description": "Approver Mailer Alias - Deprecated",
+          "type": "string",
+          "title": "Approver Mailer Alias",
+          "readOnly": true,
+          "example": "mcmp_central_funding"
+        },
+        "approver_mailer_aliases": {
+          "description": "Approver Mailer Alias List",
+          "type": "array",
+          "title": "Approver Mailer Aliases",
+          "items": {
+            "type": "string"
+          },
+          "readOnly": true,
+          "example": [
+            "abc@cisco.com",
+            "xyz@cisco.com"
+          ]
+        },
+        "approvers": {
+          "description": "Approvers of this Approval request",
+          "type": "array",
+          "title": "approvers",
+          "items": {
+            "type": "string"
+          },
+          "readOnly": true,
+          "example": [
+            "mcmp_central_funding1",
+            "mcmp_central_funding2"
+          ]
+        },
+        "audit": {
+          "$ref": "#/definitions/audit"
+        },
+        "data": {
+          "$ref": "#/definitions/data"
+        },
+        "entity_classifier": {
+          "description": "type of the underlying entity",
+          "type": "string",
+          "title": "Entity Classifier",
+          "readOnly": true,
+          "example": "Project"
+        },
+        "entity_id": {
+          "description": "Unique identifier for the Entity",
+          "type": "string",
+          "format": "uuid",
+          "title": "Entity Identifier",
+          "readOnly": true,
+          "example": "3377f6e7-dd55-4639-bc54-65646fde2ade"
+        },
+        "entity_name": {
+          "description": "Name of the underlying entity",
+          "type": "string",
+          "title": "Entity Name",
+          "readOnly": true,
+          "example": "test-openshift-project"
+        },
+        "entity_uri": {
+          "description": "entity_uri of this approvals",
+          "type": "string",
+          "title": "Entity URI",
+          "readOnly": true,
+          "example": "/resources/3377f6e7-dd55-4639-bc54-65646fde2adc"
+        },
+        "id": {
+          "description": "unique identifier for the approvals",
+          "type": "string",
+          "format": "uuid",
+          "title": "Approval Identifier",
+          "readOnly": true,
+          "example": "15795956-d322-11e8-a8d5-f2801f1b9fd1"
+        },
+        "metadata": {
+          "description": "Metadata associated with the Approval",
+          "type": "object",
+          "title": "Metadata",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "requester": {
+          "description": "Requester of this approval request",
+          "type": "string",
+          "title": "requester",
+          "readOnly": true,
+          "example": "user-cec"
+        },
+        "service": {
+          "description": "Service name that request Approval",
+          "type": "string",
+          "title": "Service",
+          "readOnly": true,
+          "example": "Openstack"
+        },
+        "servicegroup_id": {
+          "description": "Unique identifier for the Service Group",
+          "type": "string",
+          "format": "uuid",
+          "title": "Service Group Identifier",
+          "readOnly": true,
+          "example": "4677f6e7-dd55-4639-bc54-65646fde2adc"
+        },
+        "servicegroup_name": {
+          "description": "Name for the Service Group",
+          "type": "string",
+          "title": "Service Group Name",
+          "readOnly": true,
+          "example": "test-sg-name"
+        },
+        "status": {
+          "description": "Status to indicate if resource is approved",
+          "type": "string",
+          "title": "Approval status",
+          "enum": [
+            "PENDING",
+            "APPROVED",
+            "REJECTED"
+          ],
+          "readOnly": true,
+          "example": "APPROVED"
+        },
+        "tenant_id": {
+          "description": "Unique identifier for the tenant",
+          "type": "string",
+          "format": "uuid",
+          "title": "Tenant Identifier",
+          "readOnly": true,
+          "example": "3377f6e7-dd55-4639-bc54-65646fde2adc"
+        },
+        "tenant_name": {
+          "description": "Name of the tenant",
+          "type": "string",
+          "title": "Tenant Name",
+          "readOnly": true,
+          "example": "test-t-name"
+        },
+        "type": {
+          "description": "Type to indicate the approval type",
+          "type": "string",
+          "title": "Approval Type",
+          "enum": [
+            "QUOTA",
+            "FUND",
+            "CONFLICT",
+            "OWNERSHIP"
+          ],
+          "readOnly": true,
+          "example": "QUOTA"
+        }
+      }
+    },
+    "audit": {
+      "description": "Audit trail details",
+      "type": "object",
+      "title": "Audit",
+      "properties": {
+        "created_at": {
+          "description": "Timestamp when the record was created",
+          "type": "string",
+          "format": "date-time",
+          "title": "Created At",
+          "readOnly": true
+        },
+        "created_by": {
+          "description": "Entity that created the record",
+          "type": "string",
+          "title": "Created By",
+          "readOnly": true,
+          "example": "user-cec"
+        },
+        "updated_at": {
+          "description": "Timestamp when the record was updated",
+          "type": "string",
+          "format": "date-time",
+          "title": "Updated At",
+          "readOnly": true
+        },
+        "updated_by": {
+          "description": "Entity that updated the record",
+          "type": "string",
+          "title": "Updated By",
+          "readOnly": true,
+          "example": "user-cec"
+        }
+      },
+      "readOnly": true
+    },
+    "data": {
+      "description": "Approval Data details.",
+      "type": "object",
+      "title": "Data",
+      "required": [
+        "entity",
+        "request"
+      ],
+      "properties": {
+        "entity": {
+          "description": "Notification entity associated with the Approval",
+          "type": "object",
+          "title": "Approval entity",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "request": {
+          "description": "Notification request associated with the Approval",
+          "type": "object",
+          "title": "Approval Notification Data",
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "delegate": {
+      "description": "A delegate record",
+      "type": "object",
+      "title": "Delegate",
+      "required": [
+        "delegates",
+        "end_date",
+        "type"
+      ],
+      "properties": {
+        "approver": {
+          "description": "cec or adgroup of approver",
+          "type": "string",
+          "title": "approver",
+          "example": "user-cec"
+        },
+        "audit": {
+          "$ref": "#/definitions/audit"
+        },
+        "delegates": {
+          "description": "Delegates of this delegate request",
+          "type": "array",
+          "title": "delegates",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "mcmp_central_funding1",
+            "user-cec-id"
+          ]
+        },
+        "end_date": {
+          "description": "timestamp when the approver will available",
+          "type": "string",
+          "format": "date-time",
+          "title": "End Date"
+        },
+        "id": {
+          "description": "unique identifier for the Delegates",
+          "type": "string",
+          "format": "uuid",
+          "title": "Delegate Identifier",
+          "readOnly": true,
+          "example": "15795956-d322-11e8-a8d5-f2801f1b9fd1"
+        },
+        "notes": {
+          "description": "notes from approver",
+          "type": "string",
+          "title": "notes",
+          "example": "not available"
+        },
+        "start_date": {
+          "description": "timestamp when approver will be unavailable",
+          "type": "string",
+          "format": "date-time",
+          "title": "Start Date"
+        },
+        "type": {
+          "description": "Type to indicate the delegate type",
+          "type": "string",
+          "title": "Delegation Type",
+          "enum": [
+            "QUOTA",
+            "FUND",
+            "CONFLICT"
+          ],
+          "example": "FUND"
+        }
+      }
+    },
+    "error": {
+      "description": "An error provides information about why the request failed.\n",
+      "type": "object",
+      "title": "Error",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "description": "Code identifies a specific type of error.\n",
+          "type": "string",
+          "title": "Code"
+        },
+        "message": {
+          "description": "The message provides details about the failure.\n",
+          "type": "string",
+          "title": "Message"
+        }
+      }
+    },
+    "user": {
+      "description": "A User is the authenticated person performing actions.\n",
+      "type": "object",
+      "title": "User Structure",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "client_id": {
+          "description": "Client_id is created via PingID",
+          "type": "string",
+          "title": "Oauth2 client_id"
+        },
+        "display": {
+          "description": "Formal name used when greeting a person",
+          "type": "string",
+          "title": "Display name"
+        },
+        "name": {
+          "description": "Human readable identifier",
+          "type": "string",
+          "title": "Login name"
+        },
+        "token": {
+          "description": "Token used during authentication",
+          "type": "string",
+          "title": "Authentication token"
+        }
+      },
+      "x-visibility": "private"
+    }
+  },
+  "responses": {
+    "400": {
+      "description": "Invalid Request Error. Check error message in the response body for details.\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-001",
+          "message": "Missing required attribute 'name'."
+        }
+      }
+    },
+    "401": {
+      "description": "Authentication Failure\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-002",
+          "message": "Authentication failed bad password."
+        }
+      }
+    },
+    "402": {
+      "description": "Insufficient Funds\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-003",
+          "message": "Insufficient Funds to cover the cost of resource."
+        }
+      }
+    },
+    "403": {
+      "description": "Authorization Failure\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-004",
+          "message": "Not authorized to perform action."
+        }
+      }
+    },
+    "404": {
+      "description": "Resource not found\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-005",
+          "message": "Resource \u003cid\u003e does not exist."
+        }
+      }
+    },
+    "409": {
+      "description": "Conflict\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-006",
+          "message": "Resource already exists."
+        }
+      }
+    },
+    "422": {
+      "description": "Unprocessable Entity Failure\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-007",
+          "message": "Resource is not able to be updated."
+        }
+      }
+    },
+    "500": {
+      "description": "Internal Server Error. Check error entity in the response body for details.\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-009",
+          "message": "Internal server error."
+        }
+      }
+    },
+    "503": {
+      "description": "Service Unavailable\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-010",
+          "message": "Service Unavailable."
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "internal": {
+      "type": "apiKey",
+      "name": "X-API-Key",
+      "in": "header"
+    },
+    "token": {
+      "type": "apiKey",
+      "name": "WAMAUTH",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "token": []
+    },
+    {
+      "internal": []
+    }
+  ],
+  "tags": [
+    {
+      "description": "Approvals Process Operations",
+      "name": "approvals"
+    }
+  ],
+  "x-mcmp-component-type": "core"
+}

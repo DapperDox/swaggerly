@@ -344,7 +344,7 @@ func (c *APISpecification) load(specLocation string) error {
 
 	if sortByList, ok := apispec.Extensions[sortMethodsByExt].([]interface{}); ok {
 		for _, sortBy := range sortByList {
-			keyname := sortBy.(string)
+			keyname, _ := sortBy.(string)
 			if _, ok := sortTypes[keyname]; !ok {
 				log().Errorf("Error: Invalid x-sortBy value %s", keyname)
 			} else {

@@ -1,0 +1,1153 @@
+{
+  "produces": [
+    "application/vnd.cia.v1+json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Provides role and access management in MultiCloud Manager including integration to Ping",
+    "title": "Role and Access Management",
+    "version": "0.22.0"
+  },
+  "basePath": "/v1",
+  "paths": {
+    "/adgroups/{name}": {
+      "x-visibility": "private",
+      "get": {
+        "description": "Verify adgroup exists in LDAP and meets all Access Control restrictions",
+        "tags": [
+          "iam"
+        ],
+        "summary": "Validate adgroup",
+        "operationId": "validateAdgroup",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "AD Group Name",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "enum": [
+              "tenant:admin",
+              "tenant:operator",
+              "tenant:view",
+              "servicegroup:admin",
+              "servicegroup:operator",
+              "funds:admin",
+              "csp:admin",
+              "csp:operator",
+              "csp:view"
+            ],
+            "type": "string",
+            "default": "tenant:admin",
+            "description": "Name of Role to validate against AD Group Restrictions",
+            "name": "role_name",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Require that the user be a member of the AD group",
+            "name": "member",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully Retrieve List of Members of an AD Group",
+            "schema": {
+              "$ref": "#/definitions/adgroup"
+            },
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        },
+        {
+          "type": "string",
+          "description": "Authenticated user for the request",
+          "name": "X-Principal",
+          "in": "header"
+        }
+      ]
+    },
+    "/authorize": {
+      "x-visibility": "private",
+      "get": {
+        "description": "Authorize",
+        "tags": [
+          "iam"
+        ],
+        "summary": "Authorize",
+        "operationId": "authorize",
+        "responses": {
+          "200": {
+            "description": "Authorization Successul",
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with Tenant to access",
+          "name": "X-Tenant-Id",
+          "in": "header"
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with Servicegroup to access",
+          "name": "X-SG-Id",
+          "in": "header"
+        },
+        {
+          "type": "string",
+          "description": "Service name of the CSP user is trying to access",
+          "name": "X-Service",
+          "in": "header"
+        },
+        {
+          "type": "string",
+          "description": "Resource user is trying to access",
+          "name": "X-Resource",
+          "in": "header",
+          "required": true
+        },
+        {
+          "type": "string",
+          "description": "Operation of attempted request (GET, POST, etc.)",
+          "name": "X-Operation",
+          "in": "header",
+          "required": true
+        }
+      ]
+    },
+    "/usergroups": {
+      "get": {
+        "description": "Retrieves a filtered list of usergroups. If no filters are provided then list is filtered based on authenticated user access.\nThere are three mutually exclusive parameters that will apply an additional level of filtering by returning the authenticated user for a given scope.\n\nFilter is applied as:\n\n`?tenant=\u003cuuid\u003e`\n`?servicegroup=\u003cuuid\u003e`\n`?service=\u003cname\u003e`\n\nExample: `?tenant=22148a04-61b3-4a24-83e4-7216a8c53304`\n",
+        "tags": [
+          "iam"
+        ],
+        "summary": "List Usergroups",
+        "operationId": "listUsergroups",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid",
+            "description": "Limits the records to Usergroups linked to a specific Tenant",
+            "name": "tenant",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "description": "Limits the records to Usergroups linked to a specific Servicegroup",
+            "name": "servicegroup",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Limits the records to Usergroups linked to a specific CSP Service name",
+            "name": "service",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Active Directory (AD) group that represents a group of Users",
+            "name": "adgroup",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "tenant:admin",
+              "tenant:operator",
+              "tenant:view",
+              "servicegroup:admin",
+              "servicegroup:operator",
+              "servicegroup:view",
+              "funds:admin",
+              "csp:admin",
+              "csp:operator",
+              "csp:view"
+            ],
+            "type": "string",
+            "description": "Name of role (subject)",
+            "name": "role_name",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Includes servicegroups level usergroups and it should be used with tenant query param",
+            "name": "include_servicegroups",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List all Usergroups matching the specified criteria",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/usergroup_view"
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "post": {
+        "description": "Grants a level of access to a group of individuals within a specific scope.\n",
+        "consumes": [
+          "application/vnd.cia.v1+json"
+        ],
+        "tags": [
+          "iam"
+        ],
+        "summary": "Add Usergroup",
+        "operationId": "addUsergroup",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier associated with Tenant",
+            "name": "X-Tenant-Id",
+            "in": "header"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier associated with Servicegroup",
+            "name": "X-SG-Id",
+            "in": "header"
+          },
+          {
+            "type": "string",
+            "description": "Service name for CSP-scoped usergroups",
+            "name": "X-Service",
+            "in": "header"
+          },
+          {
+            "description": "Usergroup details",
+            "name": "usergroup",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/usergroup"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Usergroup added",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "format": "url",
+                "description": "URL to the Usergroup"
+              },
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "409": {
+            "$ref": "#/responses/409"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        }
+      ]
+    },
+    "/usergroups/overrides": {
+      "x-visibility": "private",
+      "post": {
+        "description": "Applies a collection of permissions to a given role and scope\n",
+        "consumes": [
+          "application/vnd.cia.v1+json"
+        ],
+        "tags": [
+          "iam"
+        ],
+        "summary": "Add Override",
+        "operationId": "addOverride",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier associated with Tenant",
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier associated with Servicegroup",
+            "name": "X-SG-Id",
+            "in": "header"
+          },
+          {
+            "description": "Override template to be assigned to a role and scope",
+            "name": "override",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/override"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Override applied",
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        }
+      ]
+    },
+    "/usergroups/{usergroupId}": {
+      "get": {
+        "description": "Retrieve a Usergroup by ID",
+        "tags": [
+          "iam"
+        ],
+        "summary": "View Usergroup",
+        "operationId": "viewUsergroup",
+        "responses": {
+          "200": {
+            "description": "Usergroup",
+            "schema": {
+              "$ref": "#/definitions/usergroup_view"
+            },
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "delete": {
+        "description": "Removes a level of access to a group of individuals within a specific scope.",
+        "tags": [
+          "iam"
+        ],
+        "summary": "Delete Usergroup",
+        "operationId": "deleteUsergroup",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier associated with Tenant",
+            "name": "X-Tenant-Id",
+            "in": "header"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier associated with Servicegroup",
+            "name": "X-SG-Id",
+            "in": "header"
+          },
+          {
+            "type": "string",
+            "description": "Service name for CSP-scoped usergroups",
+            "name": "X-Service",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Usergroup deleted",
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "patch": {
+        "description": "Changes which group of individuals that have a level of access within a specific scope.",
+        "consumes": [
+          "application/vnd.cia.v1+json"
+        ],
+        "tags": [
+          "iam"
+        ],
+        "summary": "Update Usergroup",
+        "operationId": "updateUsergroup",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier associated with Tenant",
+            "name": "X-Tenant-Id",
+            "in": "header"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier associated with Servicegroup",
+            "name": "X-SG-Id",
+            "in": "header"
+          },
+          {
+            "type": "string",
+            "description": "Service name for CSP-scoped usergroups",
+            "name": "X-Service",
+            "in": "header"
+          },
+          {
+            "description": "Updateable attributes of the Usergroup",
+            "name": "usergroup",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/usergroup_partial"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Usergroup Updated",
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "409": {
+            "$ref": "#/responses/409"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier for Usergroup",
+          "name": "usergroupId",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/users/self": {
+      "x-visibility": "private",
+      "get": {
+        "description": "Show the authenticated user details",
+        "tags": [
+          "iam"
+        ],
+        "summary": "View User Details",
+        "operationId": "getUserInfo",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Flag to determine if additional User information is desired.",
+            "name": "extended",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of User Information",
+            "schema": {
+              "$ref": "#/definitions/user_view"
+            },
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        }
+      ]
+    },
+    "/users/{username}": {
+      "x-visibility": "private",
+      "get": {
+        "description": "Verify User Exists in Active Direcotry",
+        "tags": [
+          "iam"
+        ],
+        "summary": "Verify User Exists in Active Directory",
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "username value of user",
+            "name": "username",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Verification of User's Existence in Active Directory",
+            "schema": {
+              "$ref": "#/definitions/user_view"
+            },
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "adgroup": {
+      "description": "A User's Active Directory Group",
+      "title": "Adgroup",
+      "properties": {
+        "name": {
+          "description": "Name of group as defined in AD",
+          "type": "string",
+          "title": "Adgroup name",
+          "example": "mcmp-dev"
+        }
+      },
+      "x-visibility": "private"
+    },
+    "error": {
+      "description": "An error provides information about why the request failed.\n",
+      "type": "object",
+      "title": "Error",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "description": "Code identifies a specific type of error.\n",
+          "type": "string",
+          "title": "Code"
+        },
+        "message": {
+          "description": "The message provides details about the failure.\n",
+          "type": "string",
+          "title": "Message"
+        }
+      }
+    },
+    "override": {
+      "description": "Permission Overrides that vary outside default permissions of a specific role",
+      "type": "object",
+      "title": "override",
+      "required": [
+        "template",
+        "scope",
+        "role_name"
+      ],
+      "properties": {
+        "role_name": {
+          "description": "Role name (subject) for the template to apply",
+          "type": "string",
+          "title": "Role Name",
+          "enum": [
+            "tenant:admin",
+            "tenant:operator",
+            "tenant:view",
+            "servicegroup:admin",
+            "servicegroup:operator",
+            "servicegroup:view",
+            "funds:admin"
+          ],
+          "example": "tenant:admin"
+        },
+        "rollback": {
+          "description": "Rollback permission overrides",
+          "type": "boolean",
+          "title": "Rollback",
+          "default": false,
+          "example": true
+        },
+        "scope": {
+          "description": "Scope of access for a Usergroup",
+          "type": "string",
+          "title": "Scope",
+          "example": "b249eeca-3312-43c5-90a7-a4a8345bb553"
+        },
+        "template": {
+          "description": "Identifier for the collection of permissions",
+          "type": "string",
+          "title": "Template Name",
+          "example": "deny.tenant.admin"
+        }
+      },
+      "x-visibility": "private"
+    },
+    "user": {
+      "description": "A User is the authenticated person performing actions.\n",
+      "type": "object",
+      "title": "user structure",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "client_id": {
+          "description": "Client_id is created via PingID",
+          "type": "string",
+          "title": "Oauth2 client_id"
+        },
+        "display": {
+          "description": "Formal name used when greeting a person",
+          "type": "string",
+          "title": "Display name"
+        },
+        "name": {
+          "description": "Human readable identifier",
+          "type": "string",
+          "title": "Login name"
+        },
+        "token": {
+          "description": "Token used during authentication",
+          "type": "string",
+          "title": "Authentication token"
+        }
+      },
+      "x-visibility": "private"
+    },
+    "user_view": {
+      "description": "A User is the authenticated person performing actions.\n",
+      "type": "object",
+      "title": "Authenticated User",
+      "properties": {
+        "info": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "username": {
+          "description": "Human readable identifier",
+          "type": "string",
+          "title": "Login name"
+        }
+      }
+    },
+    "usergroup": {
+      "description": "Defines a level of access (role) that a group of individuals will have within a specific scope. Each role has been pre-defined to include specific permissions.\n\n  - admin has create, read, update, and delete access\n  - operator has create, read, and update access\n  - view has read access\n",
+      "type": "object",
+      "title": "Usergroup",
+      "required": [
+        "adgroup",
+        "role_name",
+        "scope"
+      ],
+      "properties": {
+        "adgroup": {
+          "description": "Active Directory (AD) Group that represents a group of Users",
+          "type": "string",
+          "title": "AD group",
+          "example": "mcmp-dev"
+        },
+        "id": {
+          "description": "Unique identifier for the Usergroup",
+          "type": "string",
+          "format": "uuid",
+          "title": "Usergroup Identifier",
+          "readOnly": true,
+          "example": "3377f6e7-dd55-4639-bc54-65646fde2adc"
+        },
+        "role_name": {
+          "description": "Name of role (subject)",
+          "type": "string",
+          "title": "Role Name",
+          "enum": [
+            "tenant:admin",
+            "tenant:operator",
+            "tenant:view",
+            "servicegroup:admin",
+            "servicegroup:operator",
+            "servicegroup:view",
+            "funds:admin",
+            "csp:admin",
+            "csp:operator",
+            "csp:view"
+          ],
+          "example": "tenant:admin"
+        },
+        "scope": {
+          "description": "Scope of access for the Usergroup. Current use of scope supports access restrictions on Tenants and Servicegroups based on their UUID values.",
+          "type": "string",
+          "title": "Scope",
+          "example": "b249eeca-3312-43c5-90a7-a4a8345bb553"
+        }
+      }
+    },
+    "usergroup_partial": {
+      "description": "Defines the attribute(s) of a Usergroup that can be modified.",
+      "type": "object",
+      "title": "Usergroup",
+      "properties": {
+        "adgroup": {
+          "description": "Active Directory (AD) group that represents a group of Users",
+          "type": "string",
+          "title": "AD group",
+          "example": "mcmp-dev"
+        }
+      }
+    },
+    "usergroup_view": {
+      "description": "A read-only view of a Usergroup.",
+      "type": "object",
+      "title": "Usergroup View",
+      "properties": {
+        "adgroup": {
+          "description": "Active Directory (AD) group that represents a group of Users",
+          "type": "string",
+          "title": "AD group",
+          "example": "mcmp-dev"
+        },
+        "id": {
+          "description": "Unique identifier for the Usergroup",
+          "type": "string",
+          "format": "uuid",
+          "title": "Usergroup Identifier",
+          "example": "3377f6e7-dd55-4639-bc54-65646fde2adc"
+        },
+        "role_name": {
+          "description": "Name of role (subject)",
+          "type": "string",
+          "title": "Role Name",
+          "enum": [
+            "tenant:admin",
+            "tenant:operator",
+            "tenant:view",
+            "servicegroup:admin",
+            "servicegroup:operator",
+            "servicegroup:view",
+            "funds:admin",
+            "csp:admin",
+            "csp:operator",
+            "csp:view"
+          ],
+          "example": "tenant:admin"
+        },
+        "scope": {
+          "description": "Scope of access for the Usergroup. Current use of scope supports access restrictions on Tenants and Servicegroups based on their UUID values.",
+          "type": "string",
+          "title": "Scope",
+          "example": "b249eeca-3312-43c5-90a7-a4a8345bb553"
+        }
+      }
+    }
+  },
+  "responses": {
+    "400": {
+      "description": "Invalid Request Error. Check error message in the response body for details.\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-001",
+          "message": "Missing required attribute 'name'."
+        }
+      }
+    },
+    "401": {
+      "description": "Authentication Failure\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-002",
+          "message": "Authentication failed bad password."
+        }
+      }
+    },
+    "402": {
+      "description": "Insufficient Funds\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-003",
+          "message": "Insufficient Funds to cover the cost of resource."
+        }
+      }
+    },
+    "403": {
+      "description": "Authorization Failure\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-004",
+          "message": "Not authorized to perform action."
+        }
+      }
+    },
+    "404": {
+      "description": "Resource not found\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-005",
+          "message": "Resource \u003cid\u003e does not exist."
+        }
+      }
+    },
+    "409": {
+      "description": "Conflict\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-006",
+          "message": "Resource already exists."
+        }
+      }
+    },
+    "422": {
+      "description": "Unprocessable Entity Failure\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-007",
+          "message": "Resource is not able to be updated."
+        }
+      }
+    },
+    "500": {
+      "description": "Internal Server Error. Check error entity in the response body for details.\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-009",
+          "message": "Internal server error."
+        }
+      }
+    },
+    "503": {
+      "description": "Service Unavailable\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-010",
+          "message": "Service Unavailable."
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "internal": {
+      "type": "apiKey",
+      "name": "X-API-Key",
+      "in": "header"
+    },
+    "token": {
+      "type": "apiKey",
+      "name": "WAMAUTH",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "token": []
+    },
+    {
+      "internal": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "iam"
+    }
+  ],
+  "x-mcmp-component-type": "core"
+}

@@ -1,0 +1,1083 @@
+{
+  "produces": [
+    "application/vnd.cia.v1+json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Manages provisioning of Openstack projects",
+    "title": "Openstack Service",
+    "version": "0.23.0"
+  },
+  "basePath": "/v1",
+  "paths": {
+    "/openstack/projects": {
+      "get": {
+        "description": "List all Openstack Projects, with optional query parameters.",
+        "tags": [
+          "openstack"
+        ],
+        "summary": "List Projects",
+        "operationId": "listProject",
+        "parameters": [
+          {
+            "minLength": 3,
+            "type": "string",
+            "description": "Search Projects by name",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "NEW",
+              "ACTIVE",
+              "FAILED",
+              "CREATING",
+              "UPDATING",
+              "DELETING",
+              "PENDING_APPROVAL"
+            ],
+            "type": "string",
+            "description": "Search Projects by status",
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filters the fields in each returned record. (comma-delimited)",
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Max number of records to return.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Segment of records to return incremented by limit.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "pattern": "([-\\+]\\w+)",
+              "type": "string"
+            },
+            "description": "Sort by fields that determines the order of the results. (comma-delimited)",
+            "name": "sort",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of Openstack Projects",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/project"
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "post": {
+        "description": "Create an Openstack Project",
+        "consumes": [
+          "application/vnd.cia.v1+json"
+        ],
+        "tags": [
+          "openstack"
+        ],
+        "summary": "Create Project",
+        "operationId": "createProject",
+        "parameters": [
+          {
+            "description": "Project details",
+            "name": "project",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/project"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Project created",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "format": "url",
+                "description": "URL of the newly created Project"
+              },
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "402": {
+            "$ref": "#/responses/402"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "409": {
+            "$ref": "#/responses/409"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Parent Tenant ID",
+          "name": "X-Tenant-Id",
+          "in": "header",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Servicegroup ID of this Project",
+          "name": "X-SG-Id",
+          "in": "header",
+          "required": true
+        }
+      ]
+    },
+    "/openstack/projects/{projectId}": {
+      "get": {
+        "description": "View an Openstack Project by ID",
+        "tags": [
+          "openstack"
+        ],
+        "summary": "Get Project",
+        "operationId": "viewProject",
+        "responses": {
+          "200": {
+            "description": "Project details",
+            "schema": {
+              "$ref": "#/definitions/project"
+            },
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete the Openstack Project",
+        "tags": [
+          "openstack"
+        ],
+        "summary": "Delete Project",
+        "operationId": "deleteProject",
+        "parameters": [
+          {
+            "type": "boolean",
+            "default": false,
+            "description": "To completely delete all the underlying Resources attached to the Project",
+            "name": "delete_resources",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Project deleted",
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifer associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "409": {
+            "$ref": "#/responses/409"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "patch": {
+        "description": "Update an existing Project",
+        "consumes": [
+          "application/vnd.cia.v1+json"
+        ],
+        "tags": [
+          "openstack"
+        ],
+        "summary": "Update Project",
+        "operationId": "updateProject",
+        "parameters": [
+          {
+            "description": "Project details to update",
+            "name": "project_partial",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/project_partial"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Project updated",
+            "headers": {
+              "X-Request-Id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifer associated with request"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "402": {
+            "$ref": "#/responses/402"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "409": {
+            "$ref": "#/responses/409"
+          },
+          "422": {
+            "$ref": "#/responses/422"
+          },
+          "default": {
+            "$ref": "#/responses/500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unqiue ID of the Project",
+          "name": "projectId",
+          "in": "path",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier associated with request",
+          "name": "X-Request-Id",
+          "in": "header",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Parent Tenant ID",
+          "name": "X-Tenant-Id",
+          "in": "header",
+          "required": true
+        },
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "Servicegroup ID of this Project",
+          "name": "X-SG-Id",
+          "in": "header",
+          "required": true
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "audit": {
+      "description": "Audit trail details",
+      "type": "object",
+      "title": "Audit",
+      "properties": {
+        "created_at": {
+          "description": "Timestamp when the record was created",
+          "type": "string",
+          "format": "date-time",
+          "title": "Created At",
+          "readOnly": true
+        },
+        "created_by": {
+          "description": "Entity that created the record",
+          "type": "string",
+          "title": "Created By",
+          "readOnly": true,
+          "example": "user-cec"
+        },
+        "updated_at": {
+          "description": "Timestamp when the record was updated",
+          "type": "string",
+          "format": "date-time",
+          "title": "Updated At",
+          "readOnly": true
+        },
+        "updated_by": {
+          "description": "Entity that updated the record",
+          "type": "string",
+          "title": "Updated By",
+          "readOnly": true,
+          "example": "user-cec"
+        }
+      },
+      "readOnly": true
+    },
+    "compute": {
+      "description": "Compute quotas associated with Project",
+      "type": "object",
+      "title": "Compute Quota",
+      "properties": {
+        "cores": {
+          "description": "Maximum number of VCPU cores a Project can have in total",
+          "type": "integer",
+          "title": "VCPU quota",
+          "example": 16
+        },
+        "instances": {
+          "description": "Maximum number of instances a Project can have",
+          "type": "integer",
+          "title": "Instance quota",
+          "example": 10
+        },
+        "ram": {
+          "description": "Maximum VRAM a Project can have in total in GBs",
+          "type": "integer",
+          "title": "RAM quota",
+          "example": 128
+        }
+      }
+    },
+    "error": {
+      "description": "An error provides information about why the request failed.\n",
+      "type": "object",
+      "title": "Error",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "description": "Code identifies a specific type of error.\n",
+          "type": "string",
+          "title": "Code"
+        },
+        "message": {
+          "description": "The message provides details about the failure.\n",
+          "type": "string",
+          "title": "Message"
+        }
+      }
+    },
+    "network": {
+      "description": "Network quotas associated with the Project",
+      "type": "object",
+      "title": "Network Quota",
+      "properties": {
+        "floating_ips": {
+          "description": "Maximum number of floating IPs a Project can have",
+          "type": "integer",
+          "title": "Floating IP quota",
+          "example": 30
+        },
+        "lbaas": {
+          "description": "Number of load balancers a Project can have",
+          "type": "integer",
+          "title": "Load balancer",
+          "example": 5
+        },
+        "lbaas_g2": {
+          "description": "Number of load balancers G2 a Project can have",
+          "type": "integer",
+          "title": "Load balancer G2",
+          "example": 5
+        },
+        "security_group_rules": {
+          "description": "A securty group rule specifies the network access rules for servers and other resources on the network",
+          "type": "integer",
+          "title": "Security group rules",
+          "example": 100
+        },
+        "security_groups": {
+          "description": "Maximum number of security groups a Project can have",
+          "type": "integer",
+          "title": "Security groups quota",
+          "example": 120
+        }
+      }
+    },
+    "project": {
+      "description": "Project details",
+      "type": "object",
+      "title": "Project",
+      "required": [
+        "name",
+        "adgroups",
+        "quota",
+        "network"
+      ],
+      "properties": {
+        "adgroups": {
+          "description": "Active Directory groups associated with the Project.  Only users that are a member of the AD groups will be able to access the Project.",
+          "type": "array",
+          "title": "Project AD Groups",
+          "items": {
+            "type": "string",
+            "pattern": "^[\\w.-]+$"
+          },
+          "example": [
+            "mcmp-admin"
+          ]
+        },
+        "audit": {
+          "$ref": "#/definitions/audit"
+        },
+        "custom_config": {
+          "description": "Custom configurations for the Openstack Project",
+          "type": "object",
+          "title": "Custom Config",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "description": {
+          "description": "Short summary of the Project",
+          "type": "string",
+          "title": "Project description",
+          "example": "This Project belongs to GIS"
+        },
+        "gpu_g1": {
+          "description": "Maximum number of GPUs (Generation 1) a Project can have",
+          "type": "integer",
+          "title": "GPU Generation 1",
+          "example": 10
+        },
+        "id": {
+          "description": "Unique ID identifying the Project",
+          "type": "string",
+          "format": "uuid",
+          "title": "Project ID",
+          "readOnly": true,
+          "example": "1234f6e7-dd55-4639-bc54-65646fde2adc"
+        },
+        "location": {
+          "description": "Datacenter pod location",
+          "type": "string",
+          "title": "Service location",
+          "example": "RTP1"
+        },
+        "metadata": {
+          "description": "Metadata associated with the Project",
+          "type": "object",
+          "title": "Metadata",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "description": "Name of the Project",
+          "type": "string",
+          "title": "Project name",
+          "minLength": 3,
+          "pattern": "^[a-zA-Z]((\\w)* *-*)*[a-zA-Z0-9]$",
+          "example": "Widget Adapter"
+        },
+        "network": {
+          "description": "Openstack network type.\n* direct_connect:internal - attaches all VMs directly to the corporate network. **DEPRECATED** set **network** to `direct_connect` and set **network_area** to `internal`\n* private:internal - enabled private networking for the project. **DEPRECATED** set **network** to `private` and set **network_area** to `internal`",
+          "type": "string",
+          "title": "Network type",
+          "enum": [
+            "private:internal",
+            "direct_connect:internal",
+            "private",
+            "direct_connect"
+          ],
+          "example": "private"
+        },
+        "network_area": {
+          "type": "string",
+          "title": "Network Area type",
+          "enum": [
+            "internal",
+            "protected",
+            "dmz"
+          ],
+          "example": "internal"
+        },
+        "quota": {
+          "$ref": "#/definitions/quota"
+        },
+        "status": {
+          "description": "Status of the Project",
+          "type": "string",
+          "title": "Project status",
+          "enum": [
+            "NEW",
+            "ACTIVE",
+            "DELETED",
+            "FAILED",
+            "CREATING",
+            "UPDATING",
+            "DELETING",
+            "PENDING_APPROVAL"
+          ],
+          "readOnly": true,
+          "example": "ACTIVE"
+        },
+        "tags": {
+          "description": "Tags associated with the Project",
+          "type": "array",
+          "title": "Project tags",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "build",
+            "jenkins"
+          ]
+        }
+      }
+    },
+    "project_partial": {
+      "description": "Partial Project captures fields for project updates.",
+      "type": "object",
+      "title": "Partial Project",
+      "properties": {
+        "adgroups": {
+          "description": "Active directory groups associated with the Project",
+          "type": "array",
+          "title": "Project AD Groups",
+          "items": {
+            "type": "string",
+            "pattern": "^[\\w.-]+$"
+          },
+          "x-omitempty": true,
+          "example": [
+            "mcmp-admin"
+          ]
+        },
+        "custom_config": {
+          "description": "Custom configurations for the Openstack Project",
+          "type": "object",
+          "title": "Custom Config",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "description": {
+          "description": "Short summary of the Project",
+          "type": "string",
+          "title": "Project description",
+          "example": "This Project belongs to GIS"
+        },
+        "gpu_g1": {
+          "description": "Maximum number of GPUs (Generation 1) a Project can have",
+          "type": "integer",
+          "title": "GPU Generation 1",
+          "example": 10
+        },
+        "quota": {
+          "$ref": "#/definitions/quota"
+        },
+        "status": {
+          "description": "Status of the Project can be used to cancel a Project request that is pending approval",
+          "type": "string",
+          "title": "Project Status",
+          "enum": [
+            "CANCELED"
+          ],
+          "example": "CANCELED"
+        }
+      }
+    },
+    "quota": {
+      "description": "Quotas associated with Project",
+      "type": "object",
+      "title": "Quota",
+      "properties": {
+        "compute": {
+          "$ref": "#/definitions/compute"
+        },
+        "network": {
+          "$ref": "#/definitions/network"
+        },
+        "storage": {
+          "$ref": "#/definitions/storage"
+        }
+      }
+    },
+    "storage": {
+      "description": "Storage quotas associated with the Project",
+      "type": "object",
+      "title": "Storage Quota",
+      "properties": {
+        "cbs": {
+          "description": "Maximum allowed CBS capacity for a Project in GB",
+          "type": "integer",
+          "title": "Cloud Block Storage (CBS) quota",
+          "example": 41200
+        },
+        "ephemeral": {
+          "description": "Ephemeral storage in GB, this parameter is used for cost calculation",
+          "type": "integer",
+          "title": "Ephemeral storage",
+          "example": 10240
+        },
+        "ephemeral_ceph": {
+          "description": "Ephemeral ceph in GB",
+          "type": "integer",
+          "title": "Ephemeral ceph",
+          "example": 200
+        },
+        "iops_1000": {
+          "description": "Maximum allowed block storage capacity at 1000 IOPS for a Project in GB",
+          "type": "integer",
+          "title": "Block storage quota at 1000 IOPS",
+          "example": 412
+        },
+        "iops_10000": {
+          "description": "Maximum allowed block storage capacity at 10000 IOPS for a Project in GB",
+          "type": "integer",
+          "title": "Block storage quota at 10000 IOPS",
+          "example": 41200
+        },
+        "iops_10000_volumes": {
+          "description": "Maximum number of volumes allowed at 10000 IOPS for a Project",
+          "type": "integer",
+          "title": "Volumes quota at 10000 IOPS",
+          "example": 40
+        },
+        "iops_1000_volumes": {
+          "description": "Maximum number of volumes allowed at 1000 IOPS for a Project",
+          "type": "integer",
+          "title": "Volumes quota at 1000 IOPS",
+          "example": 40
+        },
+        "iops_12500": {
+          "description": "Maximum allowed block storage capacity at 12500 IOPS for a Project in GB",
+          "type": "integer",
+          "title": "Block storage quota at 12500 IOPS",
+          "example": 41200
+        },
+        "iops_12500_volumes": {
+          "description": "Maximum number of volumes allowed at 12500 IOPS for a Project",
+          "type": "integer",
+          "title": "Volumes quota at 12500 IOPS",
+          "example": 40
+        },
+        "iops_15000": {
+          "description": "Maximum allowed block storage capacity at 15000 IOPS for a Project in GB",
+          "type": "integer",
+          "title": "Block storage quota at 15000 IOPS",
+          "example": 41200
+        },
+        "iops_15000_volumes": {
+          "description": "Maximum number of volumes allowed at 15000 IOPS for a Project",
+          "type": "integer",
+          "title": "Volumes quota at 15000 IOPS",
+          "example": 40
+        },
+        "iops_2500": {
+          "description": "Maximum allowed block storage capacity at 2500 IOPS for a Project in GB",
+          "type": "integer",
+          "title": "Block storage quota at 2500 IOPS",
+          "example": 41200
+        },
+        "iops_2500_volumes": {
+          "description": "Maximum number of volumes allowed at 2500 IOPS for a Project",
+          "type": "integer",
+          "title": "Volumes quota at 2500 IOPS",
+          "example": 40
+        },
+        "iops_5000": {
+          "description": "Maximum allowed block storage capacity at 5000 IOPS for a Project in GB",
+          "type": "integer",
+          "title": "Block storage quota at 5000 IOPS",
+          "example": 41200
+        },
+        "iops_5000_volumes": {
+          "description": "Maximum number of volumes allowed at 5000 IOPS for a Project",
+          "type": "integer",
+          "title": "Volumes quota at 5000 IOPS",
+          "example": 40
+        },
+        "iops_7500": {
+          "description": "Maximum allowed block storage capacity at 7500 IOPS for a Project in GB",
+          "type": "integer",
+          "title": "Block storage quota at 7500 IOPS",
+          "example": 41200
+        },
+        "iops_7500_volumes": {
+          "description": "Maximum number of volumes allowed at 7500 IOPS for a Project",
+          "type": "integer",
+          "title": "Volumes quota at 7500 IOPS",
+          "example": 40
+        },
+        "iops_basic": {
+          "description": "Maximum allowed block storage capacity for basic performance that provides max 5000 IOPS for a Project",
+          "type": "integer",
+          "title": "Block storage quota basic",
+          "example": 100
+        },
+        "iops_basic_volumes": {
+          "description": "Maximum number of volumes allowed for basic performance that provides max 5000 IOPS for a Project",
+          "type": "integer",
+          "title": "Volumes quota for basic IOPS",
+          "example": 10
+        },
+        "iops_premium": {
+          "description": "Maximum allowed block storage capacity for premium performance that provides max 40000 IOPS for a Project in GB",
+          "type": "integer",
+          "title": "Block storage quota premium",
+          "example": 400
+        },
+        "iops_premium_volumes": {
+          "description": "Maximum number of volumes allowed for premium performance that provides max 40000 IOPS for a Project",
+          "type": "integer",
+          "title": "Volumes quota for premium IOPS",
+          "example": 40
+        },
+        "iops_standard": {
+          "description": "Maximum allowed block storage capacity for standard performance that provides max 20000 IOPS for a Project",
+          "type": "integer",
+          "title": "Block storage quota standard",
+          "example": 200
+        },
+        "iops_standard_volumes": {
+          "description": "Maximum number of volumes allowed for standard performance that provides max 20000 IOPS for a Project",
+          "type": "integer",
+          "title": "Volumes quota for standard IOPS",
+          "example": 20
+        },
+        "object": {
+          "description": "Object storage in GB, this parameter is used for cost calculation",
+          "type": "integer",
+          "title": "Object storage",
+          "example": 1500
+        },
+        "snapshots": {
+          "description": "Maximum number of snapshots allowed in a Project",
+          "type": "integer",
+          "title": "Snapshots quota",
+          "example": 100
+        },
+        "volumes": {
+          "description": "Maximum number of volumes allowed in a Project",
+          "type": "integer",
+          "title": "Volumes quota",
+          "example": 105
+        }
+      }
+    },
+    "user": {
+      "description": "A User is the authenticated person performing actions.\n",
+      "type": "object",
+      "title": "User Structure",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "client_id": {
+          "description": "Client_id is created via PingID",
+          "type": "string",
+          "title": "Oauth2 client_id"
+        },
+        "display": {
+          "description": "Formal name used when greeting a person",
+          "type": "string",
+          "title": "Display name"
+        },
+        "name": {
+          "description": "Human readable identifier",
+          "type": "string",
+          "title": "Login name"
+        },
+        "token": {
+          "description": "Token used during authentication",
+          "type": "string",
+          "title": "Authentication token"
+        }
+      },
+      "x-visibility": "private"
+    }
+  },
+  "responses": {
+    "400": {
+      "description": "Invalid Request Error. Check error message in the response body for details.\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-001",
+          "message": "Missing required attribute 'name'."
+        }
+      }
+    },
+    "401": {
+      "description": "Authentication Failure\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-002",
+          "message": "Authentication failed bad password."
+        }
+      }
+    },
+    "402": {
+      "description": "Insufficient Funds\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-003",
+          "message": "Insufficient Funds to cover the cost of resource."
+        }
+      }
+    },
+    "403": {
+      "description": "Authorization Failure\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-004",
+          "message": "Not authorized to perform action."
+        }
+      }
+    },
+    "404": {
+      "description": "Resource not found\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-005",
+          "message": "Resource \u003cid\u003e does not exist."
+        }
+      }
+    },
+    "409": {
+      "description": "Conflict\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-006",
+          "message": "Resource already exists."
+        }
+      }
+    },
+    "422": {
+      "description": "Unprocessable Entity Failure\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-007",
+          "message": "Resource is not able to be updated."
+        }
+      }
+    },
+    "500": {
+      "description": "Internal Server Error. Check error entity in the response body for details.\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-009",
+          "message": "Internal server error."
+        }
+      }
+    },
+    "503": {
+      "description": "Service Unavailable\n",
+      "schema": {
+        "$ref": "#/definitions/error"
+      },
+      "headers": {
+        "X-Request-Id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifer associated with request"
+        }
+      },
+      "examples": {
+        "application/json": {
+          "code": "EXAMPLE-010",
+          "message": "Service Unavailable."
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "token": {
+      "type": "apiKey",
+      "name": "WAMAUTH",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "token": []
+    }
+  ],
+  "tags": [
+    {
+      "description": "Openstack Project Operations",
+      "name": "openstack"
+    }
+  ],
+  "x-mcmp-component-type": "private-cloud"
+}

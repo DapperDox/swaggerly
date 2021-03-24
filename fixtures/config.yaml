@@ -1,2 +1,17 @@
 spec-dir: ../fixtures/
 spec-filename: api.json
+spec-outdir: ../tmp/
+spec.rewrites: ../fixtures/rewrites.yaml
+spec.groupings:
+  approvals : Service Provider APIs
+  reporting : Service Provider APIs
+  fakeserviceone: Custom Group 1
+discovery:
+  ignorelist:
+    services:
+      - apigw
+      - auth-local
+      - discovery
+      - docs
+      - redis
+      - ui

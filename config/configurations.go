@@ -36,7 +36,19 @@ const (
 	SpecFilename    = "spec-filename"
 	SpecDefaultHost = "spec.default.host"
 	SpecRewriteURL  = "spec.rewrite.url"
+	SpecRewrites    = "spec.rewrites"
+	SpecGroupings   = "spec.groupings"
 	ForceSpecList   = "force-specification-list"
+
+	// auto-discovery configs.
+	DiscoveryDomain            = "discovery.domain"
+	DiscoveryNamespace         = "discovery.namespace"
+	DiscoveryInterval          = "discovery.interval"
+	DiscoveryRetries           = "discovery.retries"
+	DiscoveryInitialDelay      = "discovery.delay.initial"
+	DiscoveryMaxDelay          = "discovery.delay.max"
+	DiscoverySpecLoadTimeout   = "discovery.spec.timeout"
+	DiscoveryServiceIgnoreList = "discovery.ignorelist.services"
 )
 
 var defaultConfigPaths = []string{
@@ -119,6 +131,14 @@ func initialize() {
 	viper.SetDefault(SpecFilename, []string{"/swagger.json"})
 	viper.SetDefault(SpecDefaultHost, "127.0.0.1")
 
+	viper.SetDefault(DiscoveryDomain, "svc.cluster.local")
+	viper.SetDefault(DiscoveryNamespace, "default")
+	viper.SetDefault(DiscoveryInterval, "10s")
+	viper.SetDefault(DiscoveryRetries, "5")
+	viper.SetDefault(DiscoveryInitialDelay, "1s")
+	viper.SetDefault(DiscoveryMaxDelay, "10s")
+	viper.SetDefault(DiscoverySpecLoadTimeout, "1s")
+
 	_ = viper.BindEnv(cfgDirKey, "CONFIG_DIR")
 	_ = viper.BindEnv(LogLevel, "LOGLEVEL")
 
@@ -138,4 +158,6 @@ func initialize() {
 	_ = viper.BindEnv(SpecFilename, "SPEC_FILENAME")
 	_ = viper.BindEnv(SpecDefaultHost, "SPEC_DEFAULT_HOST")
 	_ = viper.BindEnv(ForceSpecList, "FORCE_SPECIFICATION_LIST")
+
+	_ = viper.BindEnv(DiscoveryNamespace, "POD_NAMESPACE")
 }

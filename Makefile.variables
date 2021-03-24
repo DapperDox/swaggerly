@@ -4,6 +4,9 @@ export IMAGE_NAME ?= $(shell awk '/image: / { print $$2; exit }' ${PROJECT_FILE}
 export VERSION = $(shell awk '/version: / { print $$2; exit }' ${PROJECT_FILE})
 IMPORT_PATH = $(shell awk '/import: / { print $$2; exit }' ${PROJECT_FILE})
 
+TEST_PKG ?=
+TEST_NAME ?=
+
 CI ?=
 ifeq ($(strip $(CI)),)
     CI_ENABLED := 0
@@ -37,6 +40,8 @@ DEV_IMAGE := ${PROJECT}_dev
 
 DOCKERRUN := docker run --rm \
 	-e PROJECT_FILE="${PROJECT_FILE}" \
+	-e TEST_PKG="${TEST_PKG}" \
+	-e TEST_NAME="${TEST_NAME}" \
 	-v ${ROOT}/.mod:/go/pkg/mod \
 	-v ${ROOT}:/usr/src/${PROJECT} \
 	-w /usr/src/${PROJECT} \

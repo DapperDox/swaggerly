@@ -1,0 +1,5 @@
+securityDefinitions: "invalid-type-string"
+
+security: "invalid-type-string"
+
+schemes: "invalid-type-string"

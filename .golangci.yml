@@ -71,6 +71,9 @@ output:
 
 # all available settings of specific linters
 linters-settings:
+  cyclop:
+    # the maximal code complexity to report
+    max-complexity: 20
   depguard:
     list-type: blacklist
     include-go-root: false
@@ -378,6 +381,21 @@ issues:
         - testpackage
         # - unparam
         # - wsl
+
+    - path: config/configurations.go|main.go
+      text: "forbidden by pattern"
+      linters:
+        - forbidigo
+
+    - path: formatter/markdown.go|handlers/reference/reference.go
+      text: "reassigned, but never used afterwards"
+      linters:
+        - wastedassign
+
+    - path: spec/spec.go
+      text: "calculated cyclomatic complexity"
+      linters:
+        - cyclop
 
     - path: render/render.go
       linters:

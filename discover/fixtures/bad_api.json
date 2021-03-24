@@ -1,0 +1,4 @@
+{
+  "securityDefinitions": "invalid-string-format",
+  "security": "invalid-string-format"
+}
